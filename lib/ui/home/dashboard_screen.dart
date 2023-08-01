@@ -1,17 +1,18 @@
 import 'dart:async';
-
 import 'package:acfashion_store/domain/controller/controllerConectivity.dart';
 import 'package:acfashion_store/ui/models/favorite_model.dart';
 import 'package:acfashion_store/ui/models/notification_model.dart';
+import 'package:acfashion_store/ui/models/orders_model.dart';
+import 'package:acfashion_store/ui/models/purchases_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
+import 'package:acfashion_store/ui/models/users_model.dart';
 import 'package:acfashion_store/ui/styles/my_colors.dart';
 import 'package:acfashion_store/ui/models/product_model.dart';
 import 'package:acfashion_store/ui/models/assets_model.dart';
-import 'package:acfashion_store/ui/views/bookmarks_screen.dart';
+import 'package:acfashion_store/ui/views/add_product_screen.dart';
+import 'package:acfashion_store/ui/views/summary_views/see_statistics_screen.dart';
 import 'package:acfashion_store/ui/views/home_screen.dart';
-import 'package:acfashion_store/ui/views/purchases_screen.dart';
 import 'package:acfashion_store/ui/views/settings_screen.dart';
-import 'package:acfashion_store/ui/views/shop_screen.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,6 +30,9 @@ class DashboardScreen extends StatefulWidget {
   final String profesion;
   final List<ProductModel> productos;
   final List<FavoriteModel> favoritos;
+  final List<PurchasesModel> compras;
+  final List<OrdersModel> pedidos;
+  final List<UsersModel> usuarios;
   DashboardScreen({
     Key? key,
     required this.id,
@@ -41,6 +45,9 @@ class DashboardScreen extends StatefulWidget {
     required this.profesion,
     required this.productos,
     required this.favoritos,
+    required this.compras,
+    required this.pedidos,
+    required this.usuarios,
   }) : super(key: key);
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -77,14 +84,18 @@ class _DashboardScreenState extends State<DashboardScreen>
   String categoriaProducto = "";
   String valoracionProducto = "";
   String precioProducto = "";
+  Map<String, dynamic> perfil = {};
   List<Map<String, dynamic>> carrito = [];
   List<ProductModel> productos = [];
+  List<FavoriteModel> favoritosAux = [];
   List<FavoriteModel> productosFavoritos = [];
+  List<PurchasesModel> compras = [];
   List<ProductModel> productosAux = [];
   List<ProductModel> categories = [];
+  List<OrdersModel> pedidos = [];
   List<ProductModel> colors = [];
+  List<UsersModel> usuarios = [];
   List<NotificationModel> notifications = [];
-
   bool _isDarkMode = false;
 
   List<ProductModel> generateProducts() {
@@ -118,9 +129,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _mostrarAlerta() {
-    Get.snackbar("Error de conexion", "No se pudo conectar con el servidor",
-        duration: const Duration(seconds: 4),
-        backgroundColor: const Color.fromARGB(255, 73, 73, 73));
+    Get.snackbar(
+      "Error de conexion",
+      "No se pudo conectar con el servidor",
+      duration: const Duration(seconds: 4),
+    );
   }
 
   void cargarDatos() {
@@ -135,6 +148,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     productos = widget.productos;
     productosAux = productos;
     productosFavoritos = widget.favoritos;
+    compras = widget.compras;
+    pedidos = widget.pedidos;
+    usuarios = widget.usuarios;
+    perfil = <String, dynamic>{
+      'uid': id,
+      'correo': correoPerfil,
+      'nombre': nombrePerfil,
+      'celular': telefonPerfil,
+      'foto': fotoPerfil,
+    };
   }
 
   void seleccionarCategoria(categoria) {
@@ -161,17 +184,24 @@ class _DashboardScreenState extends State<DashboardScreen>
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: _isDarkMode != false
+                  ? Color.fromARGB(255, 19, 18, 18)
+                  : Colors.white,
               title: Text(
                 'Mis Notificaciones',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(
+                    color: _isDarkMode != false ? Colors.white : Colors.black),
               ),
               content: Container(
-                color: Colors.white,
+                color: _isDarkMode != false
+                    ? Color.fromARGB(255, 19, 18, 18)
+                    : Colors.white,
                 padding: EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
                   child: Container(
-                    color: Colors.white,
+                    color: _isDarkMode != false
+                        ? Color.fromARGB(255, 19, 18, 18)
+                        : Colors.white,
                     padding: EdgeInsets.all(5.0),
                     child: Center(
                       child: Column(
@@ -188,13 +218,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                     Navigator.of(context).pop();
                   },
                   child: Text('Marcar como leidas',
-                      style: TextStyle(color: Colors.black)),
+                      style: TextStyle(
+                          color: _isDarkMode != false
+                              ? Colors.white
+                              : Colors.black)),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Borrar', style: TextStyle(color: Colors.black)),
+                  child: Text('Borrar',
+                      style: TextStyle(
+                          color: _isDarkMode != false
+                              ? Colors.white
+                              : Colors.black)),
                 ),
               ],
             );
@@ -219,6 +256,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     setState(() {
       _controllerconectivity = connectivityResult != ConnectivityResult.none;
     });
+  }
+
+  void obtenerNuevaListaFavoritos(List<FavoriteModel> favoritosobtenidos) {
+    print(
+        "Esta fue la lista de favoritos que llego al dash: $favoritosobtenidos");
+    this.favoritosAux = favoritosobtenidos;
+    if (favoritosAux.length == 0) {
+      productosFavoritos.clear();
+    }
+    print("Nueva lista de favoritos en el dash: $productosFavoritos");
   }
 
   @override
@@ -301,14 +348,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
     final List<Widget> _widgetOptions = <Widget>[
       HomeScreen(
-        favoritos: productosFavoritos,
-        productos: productos,
-        id: id,
-        onProductosSeleccionados: obtenerCantidadProductosSeleccionados,
-        onCarrito: obtenerCarrito,
-      ),
-      BookMarksScreen(favoritos: productosFavoritos),
-      PurchasesScreen(favoritos: productosFavoritos),
+          usuarios: usuarios,
+          pedidos: pedidos,
+          compras: compras,
+          productos: productos),
+      AddProductScreen(),
+      SeeStatisticsScreen(),
       SettingsScreen(),
     ];
     return AnimatedContainer(
@@ -328,113 +373,96 @@ class _DashboardScreenState extends State<DashboardScreen>
           backgroundColor: _isDarkMode != false
               ? Color.fromARGB(255, 19, 18, 18)
               : Colors.white,
-          leading: SizedBox(
-            width: 20, // Ajusta el ancho según sea necesario
+          leading: Container(
             child: isDrawerOpen
-                ? GestureDetector(
-                    child: CircleAvatarOpen(
-                        controller: _controllerconectivity,
-                        img: fotoPerfil,
-                        text: ''),
-                    onTap: () {
-                      setState(() {
-                        xOffset = 0;
-                        yOffset = 0;
-                        isDrawerOpen = false;
-                      });
-                    },
+                ? Container(
+                    padding: EdgeInsets.only(left: 6),
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      child: CircleAvatarOpen(
+                          controller: _controllerconectivity,
+                          img: fotoPerfil,
+                          text: ''),
+                      onTap: () {
+                        setState(() {
+                          xOffset = 0;
+                          yOffset = 0;
+                          isDrawerOpen = false;
+                        });
+                      },
+                    ),
                   )
-                : GestureDetector(
-                    child: CircleAvatarClose(
-                        controller: _controllerconectivity,
-                        img: fotoPerfil,
-                        text: ''),
-                    onTap: () {
-                      setState(() {
-                        FocusScope.of(context).unfocus(); // Cierra el teclado
-                        xOffset = 290;
-                        yOffset = 80;
-                        isDrawerOpen = true;
-                      });
-                    },
+                : Container(
+                    padding: EdgeInsets.only(left: 10),
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      child: CircleAvatarClose(
+                          controller: _controllerconectivity,
+                          img: fotoPerfil,
+                          text: ''),
+                      onTap: () {
+                        setState(() {
+                          FocusScope.of(context).unfocus(); // Cierra el teclado
+                          xOffset = 290;
+                          yOffset = 80;
+                          isDrawerOpen = true;
+                        });
+                      },
+                    ),
                   ),
           ),
-          //IconButton(
-          //     icon: CircleAvatar(
-          //       backgroundImage: fotoPerfil != ""
-          //           ? NetworkImage(fotoPerfil)
-          //           : NetworkImage(
-          //               "https://cdn-icons-png.flaticon.com/512/149/149071.png"),
-          //       radius: 18,
-          //     ),
-          //     onPressed: () {
-          //       setState(() {
-          //         FocusScope.of(context).unfocus(); // Cierra el teclado
-          //         xOffset = 290;
-          //         yOffset = 80;
-          //         isDrawerOpen = true;
-          //       });
-          //     }
-          //() => Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (context) => DrawerScreen(
-          //               uid: id,
-          //               nombre: nombrePerfil,
-          //               correo: correoPerfil,
-          //               // contrasena: contrasenaPerfil,
-          //               celular: telefonPerfil,
-          //               direccion: direccionPerfil,
-          //               catalogo: fotoPerfil,
-          //               profesion: profesionPerfil,
-          //             ))),
-          // builder: (context) => Aside(
-          //       id: id,
-          //       nombre: nombrePerfil,
-          //       correo: correoPerfil,
-          //       contrasena: contrasenaPerfil,
-          //       telefono: telefonPerfil,
-          //       direccion: direccionPerfil,
-          //       catalogo: fotoPerfil,
-          //       profesion: profesionPerfil,
-          //     ))),
-          //),
           elevation: 0,
           flexibleSpace: isSearchOpen != true
               ? Container()
-              : Row(children: [
-                  SizedBox(
-                    width: size.width * 0.12,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        hintText: "Buscar",
-                        suffix: IconButton(
-                          hoverColor: _isDarkMode != false
-                              ? Colors.black
-                              : Colors.white,
-                          splashColor: _isDarkMode != false
-                              ? Colors.black
-                              : Colors.white,
-                          alignment: Alignment.centerRight,
-                          iconSize: 20,
-                          icon: Icon(
-                            Icons.close,
+              : Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  alignment: Alignment.bottomCenter,
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          bottom: 3,
+                        ),
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          padding: EdgeInsets.only(left: 46),
+                          decoration: BoxDecoration(
                             color: _isDarkMode != false
-                                ? Colors.white
-                                : Colors.black,
+                                ? Colors.grey[900]
+                                : Color.fromRGBO(247, 232, 253, 1),
+                            borderRadius: BorderRadius.circular(50),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              isSearchOpen = false;
-                            });
-                          },
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                                hintText: 'Buscar',
+                                hintStyle: TextStyle(
+                                  color: _isDarkMode != false
+                                      ? Colors.white
+                                      : Colors.black38,
+                                ),
+                                border: InputBorder.none,
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isSearchOpen = false;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: _isDarkMode != false
+                                        ? Colors.white
+                                        : Colors.black38,
+                                  ),
+                                )),
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ]),
+                ),
           actions: [
             isSearchOpen != false
                 ? Container()
@@ -464,52 +492,54 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 ),
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.shopping_cart_outlined,
+                                icon: Icon(Icons.calendar_today,
                                     color: _isDarkMode != false
                                         ? Colors.white
                                         : Colors.black),
                                 onPressed: () async {
-                                  if (_controllerconectivity == true) {
-                                    final result = await Navigator.push<int>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ShopScreen(
-                                          compra: carrito,
-                                          itemCount: itemCount,
-                                          id: id.isNotEmpty ? "" : id,
-                                        ),
-                                      ),
-                                    );
-                                    if (result != null) {
-                                      setState(() {
-                                        itemCount.value = result;
-                                      });
-                                    }
-                                  } else {
-                                    _mostrarAlerta();
-                                  }
+                                  // if (_controllerconectivity == true) {
+                                  //   final result = await Navigator.push<int>(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (context) => ShopScreen(
+                                  //         perfil: perfil,
+                                  //         compra: carrito,
+                                  //         itemCount: itemCount,
+                                  //         id: id,
+                                  //       ),
+                                  //     ),
+                                  //   );
+                                  //   if (result != null) {
+                                  //     setState(() {
+                                  //       itemCount.value = result;
+                                  //     });
+                                  //   }
+                                  // } else {
+                                  //   _mostrarAlerta();
+                                  // }
                                 },
                               ),
                             )
                           : IconButton(
                               onPressed: () async {
-                                final result = await Navigator.push<int>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ShopScreen(
-                                      id: id.isNotEmpty ? "" : id,
-                                      compra: carrito,
-                                      itemCount: itemCount,
-                                    ),
-                                  ),
-                                );
-                                if (result != null) {
-                                  setState(() {
-                                    itemCount.value = result;
-                                  });
-                                }
+                                // final result = await Navigator.push<int>(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => ShopScreen(
+                                //       perfil: perfil,
+                                //       id: id.isNotEmpty ? "" : id,
+                                //       compra: carrito,
+                                //       itemCount: itemCount,
+                                //     ),
+                                //   ),
+                                // );
+                                // if (result != null) {
+                                //   setState(() {
+                                //     itemCount.value = result;
+                                //   });
+                                // }
                               },
-                              icon: Icon(Icons.shopping_cart_outlined,
+                              icon: Icon(Icons.calendar_today,
                                   color: _isDarkMode != false
                                       ? Colors.white
                                       : Colors.black)),
@@ -608,7 +638,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             AnimatedContainer(
                               duration: Duration(seconds: 1),
                               curve: Curves.fastLinearToSlowEaseIn,
-                              width: index == _page ? displayWidth * .13 : 0,
+                              width: index == _page ? displayWidth * .12 : 0.1,
                             ),
                             AnimatedOpacity(
                               opacity: index == _page ? 1 : 0,
@@ -619,7 +649,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 15,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
@@ -655,15 +685,15 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   List<IconData> listOfIcons = [
     Icons.home_rounded,
-    Icons.favorite_rounded,
-    Icons.shopping_bag_rounded,
+    Icons.add_business_rounded,
+    Icons.wechat_sharp,
     Icons.settings_rounded,
   ];
 
   List<String> listOfStrings = [
     'Inicio',
-    'Favoritos',
-    'Almacen',
+    'Productos',
+    'Estadistica',
     'Ajustes',
   ];
 }
@@ -726,9 +756,6 @@ class CircleAvatarOpen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(child: imageWidget),
-        SizedBox(
-          width: 20,
-        ),
       ],
     );
   }
@@ -755,7 +782,7 @@ class CircleAvatarClose extends StatelessWidget {
       // Si img es una URL válida, carga la imagen desde la URL
       imageWidget = _controllerconectivity != false
           ? CircleAvatar(
-              radius: 25,
+              radius: 20,
               backgroundImage: NetworkImage(img),
               child: Container(
                 alignment: Alignment.center,
@@ -784,12 +811,9 @@ class CircleAvatarClose extends StatelessWidget {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Expanded(child: imageWidget),
-        SizedBox(
-          width: 20,
-        ),
       ],
     );
   }

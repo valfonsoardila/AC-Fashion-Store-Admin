@@ -28,7 +28,8 @@ class ControlProducto extends GetxController {
 
   Future<void> controlProducto(dynamic respuesta) async {
     if (respuesta == null) {
-      _mensaje.value = "Por favor intente de nuevo";
+      _mensaje.value = "Ocurrio un error, por favor intente de nuevo";
+      ;
       print(_mensaje.value);
     } else if (respuesta == "1" || respuesta == "2") {
       _mensaje.value = "Por favor intente de nuevo";

@@ -1,227 +1,73 @@
-import 'dart:async';
-
-import 'package:acfashion_store/domain/controller/controllerConectivity.dart';
-import 'package:acfashion_store/ui/models/assets_model.dart';
-import 'package:acfashion_store/ui/models/favorite_model.dart';
-import 'package:acfashion_store/ui/models/notification_model.dart';
+import 'dart:math';
+import 'package:acfashion_store/ui/models/orders_model.dart';
 import 'package:acfashion_store/ui/models/product_model.dart';
+import 'package:acfashion_store/ui/models/purchases_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
+import 'package:acfashion_store/ui/models/users_model.dart';
 import 'package:acfashion_store/ui/styles/my_colors.dart';
-import 'package:acfashion_store/ui/views/detail_screen.dart';
+import 'package:acfashion_store/ui/views/summary_views/see_orders_screen.dart';
+import 'package:acfashion_store/ui/views/summary_views/see_products_screens.dart';
+import 'package:acfashion_store/ui/views/summary_views/see_statistics_screen.dart';
+import 'package:acfashion_store/ui/views/summary_views/see_users_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:connectivity/connectivity.dart';
-import 'package:get/get.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  final List<FavoriteModel> favoritos;
-  final List<ProductModel> productos;
-  final String id;
-  final Function(int) onProductosSeleccionados;
-  final Function(List<Map<String, dynamic>>) onCarrito;
-  const HomeScreen({
-    super.key,
-    required this.favoritos,
-    required this.productos,
-    required this.id,
-    required this.onProductosSeleccionados,
-    required this.onCarrito,
-  });
+  final pedidos;
+  final compras;
+  final productos;
+  final usuarios;
+  HomeScreen(
+      {super.key, this.pedidos, this.compras, this.productos, this.usuarios});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  ControlConectividad controlconect = ControlConectividad();
-  bool _controllerconectivity = true;
-
-  String id = "";
-  bool _isFavorite = false;
-  RxInt itemCount = 0.obs;
-  String idProducto = "";
-  int cantidadProducto = 0;
-  String fotoProducto = "";
-  String nombreProducto = "";
-  String descripcionProducto = "";
-  String colorProducto = "";
-  String tallaProducto = "";
-  String categoriaProducto = "";
-  String valoracionProducto = "";
-  String precioProducto = "";
-  List<FavoriteModel> favoritos = [];
-  List<Map<String, dynamic>> carrito = [];
+  List<OrdersModel> pedidos = [];
+  List<PurchasesModel> compras = [];
   List<ProductModel> productos = [];
-  List<ProductModel> productosAux = [];
-  List<ProductModel> categories = [];
-  List<ProductModel> colors = [];
-  List<NotificationModel> notifications = [];
-
-  bool _isDarkMode = false;
-
-  List<ProductModel> generateProducts() {
-    return productos;
-  }
-
-  List<NotificationModel> notificationsList() {
-    return notifications;
-  }
-
-  void seleccionarProductos(
-    dynamic cantidad,
-    List<Map<String, dynamic>> carrito,
-  ) {
-    setState(() {
-      itemCount.value = cantidad;
-      print("itemCount desde el home secren: " + itemCount.value.toString());
-    });
-    widget.onProductosSeleccionados(itemCount.value);
-    widget.onCarrito(carrito);
-  }
-
-  //Pendiente para cambiar esta funcion
-  final List<String> bannerImages = [
-    "assets/images/banners/img_banner1.png",
-    "assets/images/banners/img_banner2.png",
-    "assets/images/banners/img_banner3.png",
+  List<UsersModel> usuarios = [];
+  List<Color> gradientColors = [
+    Color(0xff23b6e6),
+    Color(0xff02d39a),
   ];
-  int currentPage = 0;
+  bool _isDarkMode = false;
+  bool availableFoto = false;
 
-  void cargarDatos() {
-    id = widget.id;
-    productos = widget.productos;
-    productosAux = productos;
-    favoritos = widget.favoritos;
-  }
-
-  void obteneridfavorito(String id) {
-    for (var i = 0; i < favoritos.length; i++) {
-      if (favoritos[i].uid == id) {
-        print("id del favorito: ${favoritos[i].uid} es igual a $id");
-        _isFavorite = true;
-      } else {
-        _isFavorite = false;
-      }
-    }
-  }
-
-  void seleccionarCategoria(categoria) {
-    categories = [];
-    productos = productosAux;
-    if (categoria != "Todos") {
-      for (var i = 0; i < productos.length; i++) {
-        if (productos[i].category == categoria) {
-          categories.add(productos[i]);
-        }
-      }
-      productos = [];
-      productos = categories;
-    } else {
-      productos = productosAux;
-    }
-  }
-
-  void _initConnectivity() async {
-    // Obtiene el estado de la conectividad al inicio
-    final connectivityResult = await Connectivity().checkConnectivity();
-    _updateConnectionStatus(connectivityResult);
-
-    // Escucha los cambios en la conectividad y actualiza el estado en consecuencia
-    Connectivity().onConnectivityChanged.listen((connectivityResult) {
-      _updateConnectionStatus(connectivityResult);
-    });
-  }
-
-  void _updateConnectionStatus(ConnectivityResult connectivityResult) {
-    setState(() {
-      _controllerconectivity = connectivityResult != ConnectivityResult.none;
-    });
-  }
+  List<Color> listaColoresLight = [
+    const Color.fromARGB(255, 217, 48, 93),
+    const Color.fromARGB(255, 140, 20, 120),
+    const Color.fromARGB(255, 126, 15, 140),
+    const Color.fromARGB(255, 172, 20, 120),
+    const Color.fromARGB(255, 217, 37, 126),
+    const Color.fromARGB(255, 140, 13, 96),
+  ];
+  List<Color> listaColoresDark = [
+    Color.fromARGB(255, 104, 3, 30),
+    Color.fromARGB(255, 94, 4, 79),
+    Color.fromARGB(255, 83, 4, 94),
+    Color.fromARGB(255, 107, 5, 71),
+    const Color.fromARGB(255, 89, 2, 34),
+    const Color.fromARGB(255, 38, 1, 21),
+    Color.fromARGB(255, 134, 7, 71),
+    const Color.fromARGB(255, 89, 2, 59),
+    Color.fromARGB(255, 92, 5, 62),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _initConnectivity();
-    cargarDatos();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  String selectedCategoryId = "0"; // ID de la categoría seleccionada
-  List<Widget> buildCategories() {
-    final theme = Provider.of<ThemeChanger>(context);
-    var temaActual = theme.getTheme();
-    if (temaActual == ThemeData.dark()) {
-      _isDarkMode = true;
-    } else {
-      _isDarkMode = false;
-    }
-    return AssetsModel.generateCategories().map((e) {
-      bool isSelected = selectedCategoryId == e.id;
-      return Container(
-        padding: EdgeInsets.only(left: 15, bottom: 10),
-        child: ElevatedButton(
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: Container(
-                  color: _isDarkMode
-                      ? Colors.grey.shade600
-                      : MyColors.grayBackground,
-                  child: e.modelo.isNotEmpty
-                      ? Image.asset(
-                          e.modelo,
-                          height: 55,
-                          width: 55,
-                        )
-                      : Container(),
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                e.category,
-                style: TextStyle(fontSize: 14, color: Colors.white),
-              ),
-            ],
-          ),
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all<Color>(
-              isSelected ? Colors.white : Colors.black38,
-            ),
-            backgroundColor: MaterialStateProperty.all<Color>(
-              isSelected
-                  ? MyColors.myPurple
-                  : _isDarkMode
-                      ? Colors.grey.shade900
-                      : Colors.white,
-            ),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-          ),
-          onPressed: () {
-            setState(() {
-              selectedCategoryId = e.id;
-              seleccionarCategoria(e.category);
-            });
-          },
-        ),
-      );
-    }).toList();
+    pedidos = widget.pedidos;
+    compras = widget.compras;
+    productos = widget.productos;
+    usuarios = widget.usuarios;
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     final theme = Provider.of<ThemeChanger>(context);
     var temaActual = theme.getTheme();
     if (temaActual == ThemeData.dark()) {
@@ -230,379 +76,905 @@ class _HomeScreenState extends State<HomeScreen> {
       _isDarkMode = false;
     }
     return Scaffold(
-      body: Container(
-        color: _isDarkMode ? Colors.black : Colors.white,
-        child: ListView(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 15,
-                  right: 15,
-                  bottom: 15,
-                  top: 10), //paddin de los banners
-              child: Stack(
-                children: [
-                  SingleChildScrollView(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        width: size.width,
-                        height: 200,
-                        child: Stack(
-                          children: [
-                            PageView.builder(
-                              itemCount: bannerImages.length,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  currentPage = index;
-                                });
-                              },
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(bannerImages[index]),
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                        right: 18,
-                                        left: 18,
-                                        top: 10,
-                                        bottom: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        RichText(
-                                          textAlign: TextAlign.center,
-                                          text: TextSpan(
-                                            text: "Nuevo lanzamiento",
-                                            style: TextStyle(
-                                                color: _isDarkMode
-                                                    ? Colors.white
-                                                    : Colors.black87,
-                                                fontSize: 16),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        RichText(
-                                          textAlign: TextAlign.start,
-                                          text: TextSpan(
-                                            text: "",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                fontSize: 28),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 62,
-                                        ),
-                                        ElevatedButton(
-                                            child: Text("  Comprar Ahora  ".toUpperCase(),
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: _isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black87)),
-                                            style: ButtonStyle(
-                                                foregroundColor:
-                                                    MaterialStateProperty.all<Color>(
-                                                        _isDarkMode
-                                                            ? Colors.black87
-                                                            : Colors.white),
-                                                backgroundColor: _isDarkMode
-                                                    ? MaterialStateProperty.all<Color>(
-                                                        Colors.grey.shade900)
-                                                    : MaterialStateProperty.all<Color>(
-                                                        Colors.white),
-                                                shape: MaterialStateProperty.all<
-                                                        RoundedRectangleBorder>(
-                                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-                                            onPressed: () {}),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List<Widget>.generate(
-                                      bannerImages.length, (index) {
-                                    return Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 4),
-                                      child: Container(
-                                        width: 6,
-                                        height: 6,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: currentPage == index
-                                              ? Colors.white
-                                              : Colors.grey,
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 60,
-              child: Container(
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: buildCategories(),
+        backgroundColor: _isDarkMode ? Colors.black : Colors.white,
+        body: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: _isDarkMode
+                      ? const Color.fromARGB(255, 28, 27, 27)
+                      : const Color.fromARGB(255, 245, 243, 243),
+                  padding: EdgeInsets.only(top: 20),
+                  alignment: Alignment.center,
+                  child: Text('Panel de administracion',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: RichText(
-                textAlign: TextAlign.start,
-                text: TextSpan(
-                    text: "Nuevos diseños",
-                    style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold)),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            GridView.count(
-              childAspectRatio: 0.6,
-              crossAxisCount: 2,
-              padding: EdgeInsets.all(5.0),
-              children: generateProducts()
-                  .map(
-                    (e) => Card(
-                      borderOnForeground: false,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
                       color: _isDarkMode
-                          ? Colors.grey.shade800
-                          : Color.fromARGB(255, 250, 228, 231),
-                      clipBehavior: Clip.antiAlias,
-                      shadowColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      elevation: 0,
-                      child: InkWell(
-                        onTap: () async {
-                          obteneridfavorito(e.id);
-                          final result = await Navigator.push(
-                              context,
-                              PageTransition(
-                                  type: PageTransitionType.leftToRight,
-                                  child: DetailScreen(
-                                    accesible: true,
-                                    isFavorited: _isFavorite,
-                                    idUser: id,
-                                    id: e.id,
-                                    cantidad: e.cantidad,
-                                    image: e.modelo,
-                                    title: e.title,
-                                    color: e.color,
-                                    talla: e.talla,
-                                    category: e.category,
-                                    description: e.description,
-                                    valoration: e.valoration,
-                                    price: e.price,
-                                  )));
-                          if (result != null) {
-                            setState(() {
-                              itemCount.value = result;
-                              print(itemCount.value);
-                              //seleccionarProductos(itemCount.value, );
-                            });
-                          }
-                        },
-                        child: Container(
-                          height: 250,
-                          width: 250,
-                          margin: EdgeInsets.only(
-                              left: 10.0, right: 10.0, top: 5.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: FutureBuilder<bool>(
-                                    future: controlconect.verificarConexion(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        print("Cargando");
-                                        return Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      } else {
-                                        if (snapshot.hasError) {
-                                          print("Error");
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        } else {
-                                          print("Conectado");
-                                          return _controllerconectivity != false
-                                              ? Image.network(
-                                                  e.catalogo,
-                                                  height: 250,
-                                                  width: double.infinity,
-                                                )
-                                              : Center(
-                                                  child: Image.asset(
-                                                    "assets/icons/ic_not_signal.png",
-                                                    height: 50,
-                                                    width: 50,
-                                                  ),
-                                                );
-                                        }
-                                      }
-                                    }),
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              Row(
-                                children: [
-                                  RichText(
-                                    textAlign: TextAlign.start,
-                                    text: TextSpan(
-                                        text: e.category,
-                                        style: TextStyle(
-                                            color: _isDarkMode
-                                                ? Colors.yellow
-                                                : MyColors.myPurple,
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  SizedBox(
-                                    width: 40,
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Colors.yellow[700],
-                                    size: 18,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    e.valoration.toString(),
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: _isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              RichText(
-                                textAlign: TextAlign.start,
-                                text: TextSpan(
-                                    text: e.title,
-                                    style: TextStyle(
-                                        color: _isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
-                                        fontSize: 18.0)),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  RichText(
-                                    textAlign: TextAlign.start,
-                                    text: TextSpan(
-                                        text: "\$ ${e.price}",
-                                        style: TextStyle(
-                                            color: _isDarkMode
-                                                ? Colors.white
-                                                : Colors.black87,
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.bold)),
-                                  ),
-                                  Spacer(),
-                                  ElevatedButton(
-                                      child: Icon(
-                                        Icons.add_shopping_cart_outlined,
-                                        color: Colors.white,
-                                      ),
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all<Color>(
-                                                  Colors.black87),
-                                          shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30)))),
-                                      onPressed: () {
-                                        if (e.cantidad > itemCount.value) {
-                                          itemCount.value++;
-                                          carrito.add({
-                                            "id": e.id,
-                                            "cantidad": e.cantidad,
-                                            "imagen": e.modelo,
-                                            "titulo": e.title,
-                                            "color": e.color,
-                                            "talla": e.talla,
-                                            "categoria": e.category,
-                                            "descripcion": e.description,
-                                            "valoracion": e.valoration,
-                                            "precio": e.price,
-                                          });
-                                          print(carrito);
-                                          print(itemCount.value);
-                                          seleccionarProductos(
-                                              itemCount.value, carrito);
-                                          WidgetsBinding.instance!
-                                              .addPostFrameCallback((_) {
-                                            setState(
-                                                () {}); // Actualizar inmediatamente después de cambiar el valor
-                                          });
-                                        }
-                                      })
-                                ],
-                              )
-                            ],
+                          ? const Color.fromARGB(255, 28, 27, 27)
+                          : const Color.fromARGB(255, 245, 243, 243),
+                      padding: EdgeInsets.only(
+                          top: 10, left: 20, bottom: 20, right: 20),
+                      alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.home,
+                            color: _isDarkMode ? Colors.white : Colors.black,
                           ),
-                        ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'inicio',
+                            style: TextStyle(
+                                color:
+                                    _isDarkMode ? Colors.white : Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
                       ),
                     ),
-                  )
-                  .toList(),
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-            )
-          ],
-        ),
-      ),
-    );
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.98,
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        SeeStatisticsScreen()),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Crecimiento de negocio",
+                                  style: TextStyle(
+                                      color: _isDarkMode
+                                          ? Colors.white
+                                          : MyColors.myPurple,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: _isDarkMode
+                                      ? Colors.white
+                                      : MyColors.myPurple,
+                                  size: 14,
+                                )
+                              ],
+                            ),
+                          ),
+                          Card(
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _isDarkMode
+                                    ? listaColoresDark[Random()
+                                        .nextInt(listaColoresDark.length)]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              //Cambiar el tamaño del grafico
+                              width: MediaQuery.of(context).size.width * 0.95,
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              padding: EdgeInsets.all(10),
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height,
+                                width: MediaQuery.of(context).size.width,
+                                child: Stack(children: [
+                                  //Grafico interactivo donde se mostrara los ingresos mes a mes
+                                  LineChart(
+                                    LineChartData(
+                                      // read about it in the LineChartData section
+                                      backgroundColor: Colors.transparent,
+                                      showingTooltipIndicators: [],
+                                      clipData: FlClipData.all(),
+                                      borderData: FlBorderData(
+                                          show: true,
+                                          border: Border(
+                                              bottom: BorderSide(
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black),
+                                              left: BorderSide(
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black),
+                                              right: BorderSide(
+                                                  color: Colors.transparent),
+                                              top: BorderSide(
+                                                  color: Colors.transparent))),
+                                      baselineX: 0,
+                                      baselineY: 0,
+                                      maxX: 12,
+                                      maxY: 12,
+                                      minX: 0,
+                                      minY: 0,
+                                      lineBarsData: [
+                                        LineChartBarData(
+                                          show: true,
+                                          shadow: Shadow(
+                                              blurRadius: 2,
+                                              color: MyColors.myPurple),
+                                          spots: [
+                                            FlSpot(0, 0),
+                                            FlSpot(5, 5),
+                                            FlSpot(7, 6),
+                                            FlSpot(8, 4),
+                                          ],
+                                          isCurved: true,
+                                          curveSmoothness: 0.5,
+                                          barWidth: 3,
+                                          showingIndicators: [0, 1, 2, 3],
+                                          dashArray: [2, 2],
+                                          aboveBarData: BarAreaData(
+                                            show: true,
+                                            cutOffY: 0,
+                                            applyCutOffY: true,
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: gradientColors
+                                                  .map((color) =>
+                                                      color.withOpacity(0.3))
+                                                  .toList(),
+                                              transform: GradientRotation(90),
+                                            ),
+                                            spotsLine: BarAreaSpotsLine(
+                                              show: true,
+                                              flLineStyle: FlLine(
+                                                color: _isDarkMode
+                                                    ? MyColors.myBlue
+                                                    : MyColors.myPurple,
+                                                strokeWidth: 1,
+                                              ),
+                                              checkToShowSpotLine: (spot) {
+                                                if (spot.x == 0 ||
+                                                    spot.x == 5 ||
+                                                    spot.x == 7 ||
+                                                    spot.x == 8) {
+                                                  return true;
+                                                } else {
+                                                  return false;
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          belowBarData: BarAreaData(
+                                            show: true,
+                                            cutOffY: 0,
+                                            applyCutOffY: true,
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: gradientColors
+                                                  .map((color) =>
+                                                      color.withOpacity(0.3))
+                                                  .toList(),
+                                              transform: GradientRotation(90),
+                                            ),
+                                            spotsLine: BarAreaSpotsLine(
+                                              show: true,
+                                              flLineStyle: FlLine(
+                                                color: _isDarkMode
+                                                    ? MyColors.myBlue
+                                                    : MyColors.myPurple,
+                                                strokeWidth: 1,
+                                              ),
+                                              checkToShowSpotLine: (spot) {
+                                                if (spot.x == 0 ||
+                                                    spot.x == 5 ||
+                                                    spot.x == 7 ||
+                                                    spot.x == 8) {
+                                                  return true;
+                                                } else {
+                                                  return false;
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          dotData: FlDotData(
+                                            show: true,
+                                            getDotPainter: (spot, percent,
+                                                barData, index) {
+                                              return FlDotCirclePainter(
+                                                radius: 5,
+                                                color: _isDarkMode
+                                                    ? MyColors.myBlue
+                                                    : MyColors.myPurple,
+                                                strokeWidth: 1,
+                                                strokeColor: _isDarkMode
+                                                    ? MyColors.myBlue
+                                                    : MyColors.myPurple,
+                                              );
+                                            },
+                                          ),
+                                          lineChartStepData: LineChartStepData(
+                                            stepDirection: 12,
+                                          ),
+                                          preventCurveOverShooting: true,
+                                          preventCurveOvershootingThreshold: 1,
+                                        )
+                                      ],
+                                      lineTouchData: LineTouchData(
+                                        enabled: true,
+                                        touchTooltipData: LineTouchTooltipData(
+                                          tooltipBgColor: _isDarkMode
+                                              ? MyColors.myBlue
+                                              : MyColors.myPurple,
+                                          getTooltipItems: (touchedSpots) {
+                                            return touchedSpots.map((e) {
+                                              return LineTooltipItem(
+                                                e.y.toString(),
+                                                TextStyle(
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              );
+                                            }).toList();
+                                          },
+                                        ),
+                                        longPressDuration: Duration(
+                                            milliseconds:
+                                                500), //tiempo que se mantiene presionado para mostrar el tooltip
+                                        getTouchedSpotIndicator:
+                                            (LineChartBarData barData,
+                                                List<int> spotIndexes) {
+                                          return spotIndexes.map((spotIndex) {
+                                            final FlSpot spot =
+                                                barData.spots[spotIndex];
+                                            if (spot.x == 0 ||
+                                                spot.x == 5 ||
+                                                spot.x == 7 ||
+                                                spot.x == 8) {
+                                              return TouchedSpotIndicatorData(
+                                                FlLine(
+                                                  color: _isDarkMode
+                                                      ? MyColors.myBlue
+                                                      : MyColors.myPurple,
+                                                  strokeWidth: 2,
+                                                ),
+                                                FlDotData(
+                                                  show: true,
+                                                  getDotPainter: (spot, percent,
+                                                      barData, index) {
+                                                    return FlDotCirclePainter(
+                                                      radius: 5,
+                                                      color: _isDarkMode
+                                                          ? MyColors.myBlue
+                                                          : MyColors.myPurple,
+                                                      strokeWidth: 1,
+                                                      strokeColor: _isDarkMode
+                                                          ? MyColors.myBlue
+                                                          : MyColors.myPurple,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            } else {
+                                              return TouchedSpotIndicatorData(
+                                                FlLine(
+                                                  color: Colors.transparent,
+                                                ),
+                                                FlDotData(
+                                                  show: false,
+                                                ),
+                                              );
+                                            }
+                                          }).toList();
+                                        },
+                                      ),
+                                      gridData: FlGridData(
+                                        show: false,
+                                      ),
+                                      titlesData: FlTitlesData(
+                                          show: true,
+                                          topTitles: AxisTitles(
+                                            axisNameWidget: Text(
+                                              "Ingresos mensuales",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black),
+                                            ),
+                                            drawBelowEverything: true,
+                                            axisNameSize: 16,
+                                            sideTitles: SideTitles(
+                                              reservedSize: 20,
+                                              interval: 1,
+                                              showTitles: true,
+                                              getTitlesWidget: (value, _) {
+                                                // Aquí agregamos un segundo argumento 'meta'
+                                                switch (value.toInt()) {
+                                                  case 0:
+                                                    return Text("Ene");
+                                                  case 1:
+                                                    return Text("Feb");
+                                                  case 2:
+                                                    return Text("Mar");
+                                                  case 3:
+                                                    return Text("Abr");
+                                                  case 4:
+                                                    return Text("May");
+                                                  case 5:
+                                                    return Text("Jun");
+                                                  case 6:
+                                                    return Text("Jul");
+                                                  case 7:
+                                                    return Text("Ago");
+                                                  case 8:
+                                                    return Text("Sep");
+                                                  case 9:
+                                                    return Text("Oct");
+                                                  case 10:
+                                                    return Text("Nov");
+                                                  case 11:
+                                                    return Text("Dic");
+                                                  default:
+                                                    return Text(
+                                                        ""); // Devolvemos un widget vacío en caso de que no haya una coincidencia
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          rightTitles: AxisTitles()),
+                                    ),
+                                    duration:
+                                        Duration(milliseconds: 150), // Optional
+                                    curve: Curves.linear, // Optional
+                                  ),
+                                ]),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.98,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SeeOrdersScreen()),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Pedidos recientes",
+                                  style: TextStyle(
+                                      color: _isDarkMode
+                                          ? Colors.white
+                                          : MyColors.myPurple,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: _isDarkMode
+                                      ? Colors.white
+                                      : MyColors.myPurple,
+                                  size: 14,
+                                )
+                              ],
+                            ),
+                          ),
+                          //Lista de pedidos cargadas
+                          Expanded(
+                            child: Container(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: pedidos.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Color colorFondo = _isDarkMode
+                                      ? listaColoresDark[Random()
+                                          .nextInt(listaColoresDark.length)]
+                                      : listaColoresLight[Random()
+                                          .nextInt(listaColoresLight.length)];
+                                  return Container(
+                                    height: 100,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                      color: colorFondo,
+                                      child: Container(
+                                        alignment: Alignment.topLeft,
+                                        padding: EdgeInsets.only(
+                                            top: 5,
+                                            left: 5,
+                                            right: 5,
+                                            bottom: 5),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Pedido ${pedidos.indexOf(pedidos[index]) + 1}",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  " - ${pedidos[index].fechaDeCompra}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  " - ${pedidos[index].horaDeCompra}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                pedidos[index].foto != ''
+                                                    ? CircleAvatar(
+                                                        radius: 12,
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                                pedidos[index]
+                                                                    .foto),
+                                                      )
+                                                    : CircleAvatar(
+                                                        radius: 12,
+                                                        backgroundImage:
+                                                            AssetImage(
+                                                          "assets/images/user.png",
+                                                        ),
+                                                      ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  pedidos[index].nombre,
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  pedidos[index].estado,
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  "Cantidad de productos: ",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  "${pedidos[index].cantidad}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.98,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SeeProductsScreen()),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Inventario de productos",
+                                  style: TextStyle(
+                                      color: _isDarkMode
+                                          ? Colors.white
+                                          : MyColors.myPurple,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: _isDarkMode
+                                      ? Colors.white
+                                      : MyColors.myPurple,
+                                  size: 14,
+                                )
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: productos.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Color colorFondo = _isDarkMode
+                                      ? listaColoresDark[Random()
+                                          .nextInt(listaColoresDark.length)]
+                                      : listaColoresLight[Random()
+                                          .nextInt(listaColoresLight.length)];
+                                  return Container(
+                                    height: 90,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                      color: colorFondo,
+                                      child: Container(
+                                        alignment: Alignment.topLeft,
+                                        padding: EdgeInsets.only(
+                                            top: 5,
+                                            left: 5,
+                                            right: 5,
+                                            bottom: 5),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Producto ${productos.indexOf(productos[index]) + 1}",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.star,
+                                                      color: Colors.white,
+                                                      size: 14,
+                                                    ),
+                                                    Text(
+                                                      " ${productos[index].valoration}",
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  "Cantidad ${productos[index].cantidad}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 15,
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              productos[index]
+                                                                  .catalogo),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Text(
+                                                      productos[index].title,
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  'Talla: ',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  productos[index].talla,
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  "Categoria del producto: ",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  "${productos[index].category}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.98,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SeeUsersScreen()),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Usuarios registrados",
+                                  style: TextStyle(
+                                    color: _isDarkMode
+                                        ? Colors.white
+                                        : MyColors.myPurple,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: _isDarkMode
+                                      ? Colors.white
+                                      : MyColors.myPurple,
+                                  size: 14,
+                                )
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            // Use Expanded here to make the ListView take all available space
+                            child: Container(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: usuarios.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Color colorFondo = _isDarkMode
+                                      ? listaColoresDark[Random()
+                                          .nextInt(listaColoresDark.length)]
+                                      : listaColoresLight[Random()
+                                          .nextInt(listaColoresLight.length)];
+                                  return Container(
+                                    height: 100,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                      color: colorFondo,
+                                      child: Container(
+                                        alignment: Alignment.topLeft,
+                                        padding: EdgeInsets.only(
+                                          top: 5,
+                                          left: 5,
+                                          right: 5,
+                                          bottom: 5,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Usuario ${usuarios.indexOf(usuarios[index]) + 1}",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  " - Tel: ${usuarios[index].celular}",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                usuarios[index].foto != ''
+                                                    ? CircleAvatar(
+                                                        radius: 20,
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                          usuarios[index].foto,
+                                                        ),
+                                                      )
+                                                    : CircleAvatar(
+                                                        radius: 20,
+                                                        backgroundImage:
+                                                            AssetImage(
+                                                          "assets/images/user.png",
+                                                        ),
+                                                      ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                  usuarios[index].nombre,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }

@@ -1,4 +1,4 @@
-import 'package:acfashion_store/domain/controller/controllerFavoritos.dart';
+import 'package:acfashion_store/domain/controller/controllerFavorito.dart';
 import 'package:acfashion_store/domain/controller/controllerUserPerfil.dart';
 import 'package:acfashion_store/domain/controller/controllerUserAuth.dart';
 import 'package:acfashion_store/ui/app.dart';

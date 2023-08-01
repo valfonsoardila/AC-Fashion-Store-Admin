@@ -1,6 +1,4 @@
-import 'dart:async';
 import 'dart:io';
-
 import 'package:acfashion_store/domain/controller/controllerConectivity.dart';
 import 'package:acfashion_store/domain/controller/controllerUserAuth.dart';
 import 'package:acfashion_store/domain/controller/controllerUserPerfil.dart';
@@ -474,6 +472,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
       _isDarkMode = false;
     }
     return Container(
+      height: MediaQuery.of(context).size.height,
       color: _isDarkMode != false
           ? Colors.grey[900]
           : Color.fromARGB(255, 247, 241, 241),
@@ -481,124 +480,138 @@ class _DrawerScreenState extends State<DrawerScreen> {
         padding: EdgeInsets.only(top: 50, left: 40, bottom: 70),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Image.asset(
-                  'assets/icons/icon.png',
-                  width:
-                      60, // Ajusta el ancho de la imagen según tus necesidades
-                  height:
-                      60, // Ajusta la altura de la imagen según tus necesidades
-                ),
-                SizedBox(
-                  width: 3,
-                ),
-                Text(
-                  'AC Fashion Store',
-                  style: TextStyle(
-                      color: MyColors.myPurple,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            NewImage(controller: _controllerconectivity, img: foto, text: ''),
-            NewRow(
-              mode: _isDarkMode,
-              textOne: 'Coreo electronico',
-              icon: Icons.person_pin_rounded,
-              textTwo: correo,
-            ),
-            NewRow(
-              mode: _isDarkMode,
-              textOne: 'Nombre de usuario',
-              icon: Icons.person_outline,
-              textTwo: nombre,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            NewRow(
-              mode: _isDarkMode,
-              textOne: 'Profesion',
-              icon: Icons.work_outline,
-              textTwo: profesion,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            NewRow(
-              mode: _isDarkMode,
-              textOne: 'Direccion',
-              icon: Icons.home_outlined,
-              textTwo: direccion,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            NewRow(
-              mode: _isDarkMode,
-              textOne: 'Celular',
-              icon: Icons.phone_outlined,
-              textTwo: celular,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            TextButton(
-              onPressed: () {
-                _mostrarGestionPerfil();
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.edit,
-                    color: Color.fromARGB(255, 219, 54, 88),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Cambiar mis Datos',
-                    style: TextStyle(color: Color.fromARGB(255, 219, 54, 88)),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  controlua.cerrarSesion();
-                  // Get.snackbar(
-                  //     "Abandonaste la sesion", controlua.mensajesUser,
-                  //     duration:  Duration(seconds: 4),
-                  //     backgroundColor:
-                  //          Color.fromARGB(255, 73, 73, 73));
-                  controlua.userValido == null && controlua.estadoUser == null
-                      ? Get.offAllNamed("/home")
-                      : Get.offAllNamed("/login");
-                  controlua.userValido.val("");
-                });
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.exit_to_app,
-                    color: Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Log out',
-                    style: TextStyle(
-                        color:
-                            Color.fromARGB(255, 219, 54, 88).withOpacity(0.5)),
-                  ),
-                ],
-              ),
-            ),
+          children: [
+            // Row(
+            //   children: <Widget>[
+            //     Image.asset(
+            //       'assets/icons/icon_3.png',
+            //       width:
+            //           60, // Ajusta el ancho de la imagen según tus necesidades
+            //       height:
+            //           60, // Ajusta la altura de la imagen según tus necesidades
+            //     ),
+            //     SizedBox(
+            //       width: 3,
+            //     ),
+            //     Column(
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         Text(
+            //           'AC Fashion Store',
+            //           style: TextStyle(
+            //               color: MyColors.myPurple,
+            //               fontSize: 22,
+            //               fontWeight: FontWeight.bold),
+            //         ),
+            //         Text(
+            //           'Admin',
+            //           style: TextStyle(
+            //             color: MyColors.myPurple,
+            //             fontSize: 22,
+            //             fontWeight: FontWeight.bold,
+            //           ),
+            //           textAlign: TextAlign.center,
+            //         ),
+            //       ],
+            //     ),
+            //   ],
+            // ),
+            // NewImage(controller: _controllerconectivity, img: foto, text: ''),
+            // NewRow(
+            //   mode: _isDarkMode,
+            //   textOne: 'Coreo electronico',
+            //   icon: Icons.person_pin_rounded,
+            //   textTwo: correo,
+            // ),
+            // NewRow(
+            //   mode: _isDarkMode,
+            //   textOne: 'Nombre de usuario',
+            //   icon: Icons.person_outline,
+            //   textTwo: nombre,
+            // ),
+            // SizedBox(
+            //   height: 20,
+            // ),
+            // NewRow(
+            //   mode: _isDarkMode,
+            //   textOne: 'Profesion',
+            //   icon: Icons.work_outline,
+            //   textTwo: profesion,
+            // ),
+            // SizedBox(
+            //   height: 20,
+            // ),
+            // NewRow(
+            //   mode: _isDarkMode,
+            //   textOne: 'Direccion',
+            //   icon: Icons.home_outlined,
+            //   textTwo: direccion,
+            // ),
+            // SizedBox(
+            //   height: 20,
+            // ),
+            // NewRow(
+            //   mode: _isDarkMode,
+            //   textOne: 'Celular',
+            //   icon: Icons.phone_outlined,
+            //   textTwo: celular,
+            // ),
+            // SizedBox(
+            //   height: 20,
+            // ),
+            // TextButton(
+            //   onPressed: () {
+            //     _mostrarGestionPerfil();
+            //   },
+            //   child: Row(
+            //     children: [
+            //       Icon(
+            //         Icons.edit,
+            //         color: Color.fromARGB(255, 219, 54, 88),
+            //       ),
+            //       SizedBox(
+            //         width: 10,
+            //       ),
+            //       Text(
+            //         'Cambiar mis Datos',
+            //         style: TextStyle(color: Color.fromARGB(255, 219, 54, 88)),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // TextButton(
+            //   onPressed: () {
+            //     setState(() {
+            //       controlua.cerrarSesion();
+            //       // Get.snackbar(
+            //       //     "Abandonaste la sesion", controlua.mensajesUser,
+            //       //     duration:  Duration(seconds: 4),
+            //       //     backgroundColor:
+            //       //          Color.fromARGB(255, 73, 73, 73));
+            //       controlua.userValido == null && controlua.estadoUser == null
+            //           ? Get.offAllNamed("/home")
+            //           : Get.offAllNamed("/login");
+            //       controlua.userValido.val("");
+            //     });
+            //   },
+            //   child: Row(
+            //     children: [
+            //       Icon(
+            //         Icons.exit_to_app,
+            //         color: Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
+            //       ),
+            //       SizedBox(
+            //         width: 10,
+            //       ),
+            //       Text(
+            //         'Log out',
+            //         style: TextStyle(
+            //             color:
+            //                 Color.fromARGB(255, 219, 54, 88).withOpacity(0.5)),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),

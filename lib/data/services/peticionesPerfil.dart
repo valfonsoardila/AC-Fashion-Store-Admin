@@ -35,9 +35,8 @@ class PeticionesPerfil {
       var url = '';
       if (foto != null) {
         url = await PeticionesPerfil.cargarfoto(foto, controlua.userValido!.id);
-        print('esta es la url de la foto: $url');
+        perfil['foto'] = url.toString();
       }
-      perfil['foto'] = url.toString();
       await _client.from('perfil').insert([perfil]);
       return true;
     } catch (error) {
@@ -100,6 +99,23 @@ class PeticionesPerfil {
     return true;
   }
 
+  static Future<List<Map<String, dynamic>>> obtenerperfiles() async {
+    try {
+      List<Map<String, dynamic>> perfiles = [];
+      final tableName = 'perfil';
+      final response = await _client.from(tableName).select('*');
+      if (response != []) {
+        perfiles = List<Map<String, dynamic>>.from(response);
+      } else {
+        perfiles = [];
+      }
+      return perfiles;
+    } catch (error) {
+      print('Error en la operación de obtención de perfiles: $error');
+      throw error;
+    }
+  }
+
   static Future<Map<String, dynamic>> obtenerperfil(id) async {
     try {
       print("Esta es la uid a consultar: $id");
@@ -139,16 +155,20 @@ class PeticionesPerfil {
 
   static Future<dynamic> cargarfoto(var foto, var idArt) async {
     final instance = _client.storage;
+    var image = '';
     final bucketName = 'perfil'; // Carpeta donde deseas almacenar las fotos
-    String fileName = 'profile.png';
+    String fileName = '$idArt/profile.png';
     final file = File(foto.path);
     try {
       final String path = await instance.from(bucketName).upload(
-            '$idArt/$fileName',
+            fileName,
             file,
             fileOptions: FileOptions(cacheControl: '3600', upsert: false),
           );
-      final response = path;
+      if (path != '') {
+        image = await instance.from(bucketName).getPublicUrl(fileName);
+      }
+      final response = image;
       return response;
     } catch (e) {
       print('Error en la operación de carga de foto: $e');

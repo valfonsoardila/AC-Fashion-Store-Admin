@@ -41,6 +41,13 @@ class ControlUserPerfil extends GetxController {
     return _response.value;
   }
 
+  Future<List<Map<String, dynamic>>> obtenerperfiles() async {
+    print("llego al controlador");
+    _response.value = await PeticionesPerfil.obtenerperfiles();
+    await controlPerfil(_response.value);
+    return _response.value;
+  }
+
   Future<void> controlPerfil(dynamic respuesta) async {
     if (respuesta == null) {
       _mensaje.value = "Por favor intente de nuevo";
@@ -54,15 +61,19 @@ class ControlUserPerfil extends GetxController {
         // Usa Session en lugar de UserCredential
         _perfil.value = respuesta;
       } else {
-        _Datos.value = respuesta;
-        print("este es el mensaje: $_mensaje");
-        print("Estos son los datos del nuevo perfil: $_Datos");
+        if (respuesta is List) {
+          _Datos.value = respuesta;
+        } else {
+          _Datos.value = respuesta;
+        }
       }
     }
   }
 
   Map<String, dynamic> get datosPerfil =>
       _Datos?.value ?? {}; // Valor predeterminado: un mapa vacío
+  List<Map<String, dynamic>> get datosPerfiles =>
+      _Datos?.value ?? []; // Valor predeterminado: una lista vacía
   dynamic get estadoPerfil => _response.value;
   String get mensajesPerfil => _mensaje.value;
   Session? get perfilValido =>

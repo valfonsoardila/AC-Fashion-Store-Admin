@@ -13,14 +13,15 @@ class PeticionesProducto {
       if (catalogo != null) {
         urlCatalogo = await PeticionesProducto.cargarImagen(
             "Catalogo", catalogo, producto['categoria']);
+        producto['catalogo'] = urlCatalogo.toString();
       }
       if (modelo != null) {
         urlModelo = await PeticionesProducto.cargarImagen(
-            "Modelo", modelo, producto['modelo']);
+            "Modelo", modelo, producto['categoria']);
+        producto['modelo'] = urlModelo.toString();
       }
-      producto['catalogo'] = urlCatalogo.toString();
-      producto['modelo'] = urlModelo.toString();
-      await _client.from('productos').insert([producto]);
+      print("este es el producto antes de guardar: $producto");
+      await _client.from('producto').insert([producto]);
       return true;
     } catch (error) {
       print('Error en la operación de creación de catálogo: $error');
@@ -30,7 +31,6 @@ class PeticionesProducto {
 
   static Future<List<Map<String, dynamic>>> obtenerProductos() async {
     try {
-      final instance = _client.storage; // Instancia de Supabase Storage
       final folderPath =
           'producto'; // Carpeta donde estan almacenadas las fotos
       List<Map<String, dynamic>> productos = []; // Lista de productos
@@ -41,35 +41,10 @@ class PeticionesProducto {
         var uid = ""; // Uid del producto
         var response = null; // Respuesta de la peticion
         uid = uids[i]['id'].toString(); // Obtiene el uid del producto
-        var catalogo = ''; // Foto catalogo del producto
-        var modelo = ''; // Foto modelo del producto
-        var imageCatalogo = null; // Imagen del producto
-        var imageModelo = null; // Imagen del producto
         response = await _client.from(folderPath).select('*').eq('id', uid);
-        catalogo =
-            '${response[0]['categoria']}/Catalogo/${response[0]['catalogo']}'
-                .toString(); // Obtiene la foto catalogo del producto
-        modelo = '${response[0]['categoria']}/Modelo/${response[0]['modelo']}'
-            .toString(); // Obtiene la foto modelo
-        print("esta es la catalogo de la base de datos: $catalogo");
-        if (catalogo.isNotEmpty && modelo.isNotEmpty) {
-          //Si la respuesta no es una url vacia
-          imageCatalogo = await instance
-              .from(folderPath)
-              .getPublicUrl(catalogo); //Obtiene la url de la imagen
-          print("esta es la imagen: $imageCatalogo");
-          response[0]['catalogo'] =
-              imageCatalogo; //Agrega la url de la imagen al perfil
-          imageModelo = await instance
-              .from(folderPath)
-              .getPublicUrl(modelo); //Obtiene la url de la imagen
-          print("esta es la imagen: $imageModelo");
-          response[0]['modelo'] = imageModelo;
-        }
         producto = Map<String, dynamic>.from(response[0]);
         productos.add(producto);
       }
-      print("esta es la lista de productos: $productos");
       return productos;
     } catch (e) {
       print("Error en la peticion:$e");
@@ -129,16 +104,20 @@ class PeticionesProducto {
   static Future<dynamic> cargarImagen(
       var carpeta, var imagen, var categoria) async {
     final instance = _client.storage;
-    final folderPath = 'productos'; // Carpeta donde deseas almacenar las fotos
-    final fileName = '$categoria/$carpeta/${imagen.path.split('/').last}';
+    var image = '';
+    final bucketName = 'producto'; // Carpeta donde deseas almacenar las fotos
+    var fileName = '$categoria/$carpeta/${imagen.path.split('/scaled_').last}';
     final file = File(imagen.path);
     try {
-      final String path = await instance.from(folderPath).upload(
+      final String path = await instance.from(bucketName).upload(
             fileName,
             file,
             fileOptions: FileOptions(cacheControl: '3600', upsert: false),
           );
-      final response = path;
+      if (path != '') {
+        image = await instance.from(bucketName).getPublicUrl(fileName);
+      }
+      final response = image;
       return response;
     } catch (e) {
       print('Error en la operación de carga de catalogo: $e');

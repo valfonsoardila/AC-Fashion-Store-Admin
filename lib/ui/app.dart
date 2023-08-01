@@ -37,7 +37,7 @@ class MaterialAppWithTheme extends StatelessWidget {
     print(theme);
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Ac Fashion Admin',
+      title: 'Ac Fashion App',
       theme: theme.getTheme(),
       initialRoute: '/',
       routes: {

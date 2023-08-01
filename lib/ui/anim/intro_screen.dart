@@ -132,7 +132,7 @@ class _IntroScreenState extends State<IntroScreen>
                               "Administra tu tienda de ropa de forma fácil y rápida",
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w300)),
                     ),
                     Spacer(),

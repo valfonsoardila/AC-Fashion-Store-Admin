@@ -48,6 +48,7 @@ dependencies:
   simple_icons: ^7.10.0
   provider: ^6.0.5
   url_launcher: ^6.1.12
+  fl_chart: ^0.63.0
 
 dev_dependencies:
   flutter_test:
