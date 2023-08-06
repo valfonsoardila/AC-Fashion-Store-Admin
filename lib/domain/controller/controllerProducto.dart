@@ -26,6 +26,20 @@ class ControlProducto extends GetxController {
     return _response.value;
   }
 
+  Future<void> actualizarproducto(
+      Map<String, dynamic> producto, catalogo, modelo) async {
+    _response.value =
+        await PeticionesProducto.actualizarProducto(producto, catalogo, modelo);
+    await controlProducto(_response.value);
+    return _response.value;
+  }
+
+  Future<void> eliminarproducto(Map<String, dynamic> producto) async {
+    _response.value = await PeticionesProducto.eliminarProducto(producto);
+    await controlProducto(_response.value);
+    return _response.value;
+  }
+
   Future<void> controlProducto(dynamic respuesta) async {
     if (respuesta == null) {
       _mensaje.value = "Ocurrio un error, por favor intente de nuevo";

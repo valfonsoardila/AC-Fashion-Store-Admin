@@ -51,15 +51,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   ImagePicker picker = ImagePicker();
   var _showPassword = false;
   var _image;
-  var correo = "";
-  var contrasena = "";
-  var nombre = "";
-  var profesion = "";
-  var ciudad = "";
-  var direccion = "";
-  var celular = "";
-  var foto = "";
-  var uid = '';
+  Map<String, dynamic> _perfil = {};
 
   bool _isDarkMode = false;
   //FUNCIONES
@@ -111,14 +103,14 @@ class _DrawerScreenState extends State<DrawerScreen> {
   }
 
   void _mostrarGestionPerfil() {
-    controlId.text = uid;
-    controlcorreo.text = correo;
-    controlContrasena.text = contrasena;
-    controlNombre.text = nombre;
-    controlProfesion.text = profesion;
-    controlDireccion.text = direccion;
-    controlTelefono.text = celular;
-    controlURL.text = foto;
+    controlId.text = _perfil['id'];
+    controlcorreo.text = _perfil['correo'];
+    controlContrasena.text = _perfil['contrasena'];
+    controlNombre.text = _perfil['nombre'];
+    controlProfesion.text = _perfil['profesion'];
+    controlDireccion.text = _perfil['direccion'];
+    controlTelefono.text = _perfil['celular'];
+    controlURL.text = _perfil['foto'];
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.5),
@@ -164,10 +156,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                         )
                                       : CircleAvatar(
                                           radius: 60,
-                                          backgroundImage: foto.isEmpty
+                                          backgroundImage: _perfil['foto']
+                                                  .isEmpty
                                               ? NetworkImage(
                                                   'https://cdn-icons-png.flaticon.com/512/149/149071.png')
-                                              : NetworkImage(foto),
+                                              : NetworkImage(_perfil['foto']),
                                         ),
                                 )),
                           ),
@@ -367,7 +360,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     Navigator.of(context).pop();
                     var perfil = <String, dynamic>{
                       'id': controlId.text,
-                      'foto': foto,
+                      'foto': _perfil['foto'],
                       'correo': controlcorreo.text,
                       'contrasena': controlContrasena.text,
                       'nombre': controlNombre.text,
@@ -375,13 +368,14 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       'direccion': controlDireccion.text,
                       'celular': controlTelefono.text,
                     };
-                    print("esta es la foto consultada desde el aside: $foto");
+                    print(
+                        "esta es la foto consultada desde el aside: $_perfil['foto']");
                     controlPerfil
                         .actualizarperfil(perfil, _image)
                         .then((value) {
                       if (controlPerfil.mensajesPerfil == "Proceso exitoso" &&
                           controlContrasena.text != "" &&
-                          controlContrasena.text != contrasena) {
+                          controlContrasena.text != _perfil['contrasena']) {
                         controlua.restablecercontrasena(controlContrasena.text);
                         Get.snackbar("Perfil Guardado Correctamente",
                             controlPerfil.mensajesPerfil,
@@ -443,18 +437,24 @@ class _DrawerScreenState extends State<DrawerScreen> {
     });
   }
 
+  void cargarDatos() {
+    _perfil = {
+      'id': widget.uid,
+      'foto': widget.foto,
+      'correo': widget.correo,
+      'contrasena': widget.contrasena,
+      'nombre': widget.nombre,
+      'profesion': widget.profesion,
+      'direccion': widget.direccion,
+      'celular': widget.celular,
+    };
+  }
+
   @override
   void initState() {
     super.initState();
     _initConnectivity();
-    uid = widget.uid;
-    correo = widget.correo;
-    contrasena = widget.contrasena;
-    nombre = widget.nombre;
-    profesion = widget.profesion;
-    direccion = widget.direccion;
-    celular = widget.celular;
-    foto = widget.foto;
+    cargarDatos();
   }
 
   @override
@@ -481,104 +481,140 @@ class _DrawerScreenState extends State<DrawerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Row(
-            //   children: <Widget>[
-            //     Image.asset(
-            //       'assets/icons/icon_3.png',
-            //       width:
-            //           60, // Ajusta el ancho de la imagen según tus necesidades
-            //       height:
-            //           60, // Ajusta la altura de la imagen según tus necesidades
-            //     ),
-            //     SizedBox(
-            //       width: 3,
-            //     ),
-            //     Column(
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Text(
-            //           'AC Fashion Store',
-            //           style: TextStyle(
-            //               color: MyColors.myPurple,
-            //               fontSize: 22,
-            //               fontWeight: FontWeight.bold),
-            //         ),
-            //         Text(
-            //           'Admin',
-            //           style: TextStyle(
-            //             color: MyColors.myPurple,
-            //             fontSize: 22,
-            //             fontWeight: FontWeight.bold,
-            //           ),
-            //           textAlign: TextAlign.center,
-            //         ),
-            //       ],
-            //     ),
-            //   ],
-            // ),
-            // NewImage(controller: _controllerconectivity, img: foto, text: ''),
-            // NewRow(
-            //   mode: _isDarkMode,
-            //   textOne: 'Coreo electronico',
-            //   icon: Icons.person_pin_rounded,
-            //   textTwo: correo,
-            // ),
-            // NewRow(
-            //   mode: _isDarkMode,
-            //   textOne: 'Nombre de usuario',
-            //   icon: Icons.person_outline,
-            //   textTwo: nombre,
-            // ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-            // NewRow(
-            //   mode: _isDarkMode,
-            //   textOne: 'Profesion',
-            //   icon: Icons.work_outline,
-            //   textTwo: profesion,
-            // ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-            // NewRow(
-            //   mode: _isDarkMode,
-            //   textOne: 'Direccion',
-            //   icon: Icons.home_outlined,
-            //   textTwo: direccion,
-            // ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-            // NewRow(
-            //   mode: _isDarkMode,
-            //   textOne: 'Celular',
-            //   icon: Icons.phone_outlined,
-            //   textTwo: celular,
-            // ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-            // TextButton(
-            //   onPressed: () {
-            //     _mostrarGestionPerfil();
-            //   },
-            //   child: Row(
-            //     children: [
-            //       Icon(
-            //         Icons.edit,
-            //         color: Color.fromARGB(255, 219, 54, 88),
-            //       ),
-            //       SizedBox(
-            //         width: 10,
-            //       ),
-            //       Text(
-            //         'Cambiar mis Datos',
-            //         style: TextStyle(color: Color.fromARGB(255, 219, 54, 88)),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            Row(
+              children: [
+                Image.asset(
+                  'assets/icons/icon_3.png',
+                  width:
+                      60, // Ajusta el ancho de la imagen según tus necesidades
+                  height:
+                      60, // Ajusta la altura de la imagen según tus necesidades
+                ),
+                SizedBox(
+                  width: 3,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'AC Fashion Store',
+                      style: TextStyle(
+                          color: _isDarkMode != false
+                              ? Colors.white
+                              : MyColors.myPurple,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Admin',
+                      style: TextStyle(
+                        color: _isDarkMode != false
+                            ? Colors.white
+                            : MyColors.myPurple,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            NewImage(
+                controller: _controllerconectivity,
+                img: _perfil['foto'],
+                text: ''),
+            NewRow(
+              mode: _isDarkMode,
+              textOne: 'Coreo electronico',
+              icon: Icons.person_pin_rounded,
+              textTwo: _perfil['correo'],
+            ),
+            NewRow(
+              mode: _isDarkMode,
+              textOne: 'Nombre de usuario',
+              icon: Icons.person_outline,
+              textTwo: _perfil['nombre'],
+            ),
+            NewRow(
+              mode: _isDarkMode,
+              textOne: 'Profesion',
+              icon: Icons.work_outline,
+              textTwo: _perfil['profesion'],
+            ),
+            NewRow(
+              mode: _isDarkMode,
+              textOne: 'Direccion',
+              icon: Icons.home_outlined,
+              textTwo: _perfil['direccion'],
+            ),
+            NewRow(
+              mode: _isDarkMode,
+              textOne: 'Celular',
+              icon: Icons.phone_outlined,
+              textTwo: _perfil['celular'],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton.icon(
+                  onPressed: () {
+                    _mostrarGestionPerfil();
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
+                  ),
+                  label: Text(
+                    'Editar Perfil',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      controlua.cerrarSesion();
+                      Get.snackbar(
+                        "Sesion cerrada",
+                        controlua.mensajesUser,
+                        duration: Duration(seconds: 4),
+                      );
+                      controlua.userValido == null &&
+                              controlua.estadoUser == null
+                          ? Get.offAllNamed("/home")
+                          : Get.offAllNamed("/login");
+                      controlua.cerrarSesion();
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.exit_to_app,
+                        color:
+                            Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        'Cerrar Sesion',
+                        style: TextStyle(
+                          color:
+                              Color.fromARGB(255, 219, 54, 88).withOpacity(0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             // TextButton(
             //   onPressed: () {
             //     setState(() {
@@ -646,58 +682,53 @@ class NewRow extends StatelessWidget {
     }
     return Row(
       children: <Widget>[
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextButton(
-                onPressed: () {
-                  // Lógica a ejecutar al presionar el botón
-                },
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Icon(
-                            icon,
-                            color: _isDarkMode != false
-                                ? Colors.white
-                                : Colors.black,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Lógica a ejecutar al presionar el botón
+              },
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Icon(
+                          icon,
+                          color: _isDarkMode != false
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            textOne,
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 219, 54, 88),
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              textOne,
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 219, 54, 88),
-                                fontSize: 14,
-                              ),
+                          Text(
+                            textTwo,
+                            style: TextStyle(
+                              color: _isDarkMode != false
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontSize: 16,
                             ),
-                            Text(
-                              textTwo,
-                              style: TextStyle(
-                                color: _isDarkMode != false
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -746,11 +777,10 @@ class NewImage extends StatelessWidget {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
+      children: [
         imageWidget,
         SizedBox(
-          width: 20,
+          width: 10,
         ),
       ],
     );

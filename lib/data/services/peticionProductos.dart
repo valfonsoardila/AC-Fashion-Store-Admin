@@ -45,6 +45,7 @@ class PeticionesProducto {
         producto = Map<String, dynamic>.from(response[0]);
         productos.add(producto);
       }
+      print("productos desde la base de datos: $productos");
       return productos;
     } catch (e) {
       print("Error en la peticion:$e");
@@ -101,6 +102,57 @@ class PeticionesProducto {
     }
   }
 
+  static Future<dynamic> actualizarProducto(
+      Map<String, dynamic> producto, catalogo, modelo) async {
+    try {
+      var urlCatalogo = '';
+      var urlModelo = '';
+      if (catalogo.runtimeType == String) {
+        print("es un string");
+        urlCatalogo = catalogo;
+      } else {
+        urlCatalogo = await PeticionesProducto.cargarImagen(
+            "Catalogo", catalogo, producto['categoria']);
+      }
+      if (modelo.runtimeType == String) {
+        print("es un string");
+        urlModelo = modelo;
+      } else {
+        urlModelo = await PeticionesProducto.cargarImagen(
+            "Modelo", modelo, producto['categoria']);
+      }
+      print("este es el producto antes de guardar: $producto");
+      await _client.from('producto').update(producto).eq('id', producto['id']);
+      return true;
+    } catch (error) {
+      print('Error en la operación de creación de catálogo: $error');
+      throw error;
+    }
+  }
+
+  static Future<dynamic> eliminarProducto(producto) async {
+    try {
+      var id = producto['id'];
+      var nameImgCatalogo =
+          producto['catalogo'].split('Catalogo/').last.split('?').first;
+      var nameImgModelo =
+          producto['modelo'].split('Modelo/').last.split('?').first;
+      if (nameImgCatalogo != '') {
+        await PeticionesProducto.eliminarImagen(
+            "Catalogo", nameImgCatalogo, nameImgCatalogo);
+      }
+      if (nameImgModelo != '') {
+        await PeticionesProducto.eliminarImagen(
+            "Modelo", nameImgModelo, nameImgModelo);
+      }
+      await _client.from('producto').delete().eq('id', id);
+      return true;
+    } catch (error) {
+      print('Error en la operación de creación de catálogo: $error');
+      throw error;
+    }
+  }
+
   static Future<dynamic> cargarImagen(
       var carpeta, var imagen, var categoria) async {
     final instance = _client.storage;
@@ -119,6 +171,22 @@ class PeticionesProducto {
       }
       final response = image;
       return response;
+    } catch (e) {
+      print('Error en la operación de carga de catalogo: $e');
+    }
+  }
+
+  static Future<dynamic> eliminarImagen(
+      var carpeta, var imagen, var categoria) async {
+    final instance = _client.storage;
+    final bucketName = 'producto'; // Carpeta donde deseas almacenar las fotos
+    try {
+      var fileName = '$categoria/$carpeta/$imagen';
+      final List<FileObject> objects =
+          await instance.from(bucketName).remove([fileName]);
+      print("eliminara del bucket: $bucketName el archivo: $fileName");
+      print("este es el objeto: $objects");
+      return true;
     } catch (e) {
       print('Error en la operación de carga de catalogo: $e');
     }

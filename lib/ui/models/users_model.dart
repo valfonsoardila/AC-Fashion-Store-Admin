@@ -30,16 +30,18 @@ class UsersModel {
         celular: json['updated_at']);
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'foto': foto,
-      'correo': correo,
-      'contrasena': contrasena,
-      'nombre': nombre,
-      'profesion': profesion,
-      'created_at': direccion,
-      'updated_at': celular
-    };
+  List<Map<String, dynamic>> toJson() {
+    return [
+      {
+        'id': id,
+        'foto': foto,
+        'correo': correo,
+        'contrasena': contrasena,
+        'nombre': nombre,
+        'profesion': profesion,
+        'direccion': direccion,
+        'celular': celular,
+      }
+    ];
   }
 }

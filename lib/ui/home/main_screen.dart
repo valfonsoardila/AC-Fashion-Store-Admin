@@ -123,14 +123,14 @@ class _MainScreenState extends State<MainScreen> {
           print("Datos de perfiles recibidos en MainScreen: $consultaPerfiles");
           if (consultaPerfiles.length > 1) {
             for (var i = 0; i < consultaPerfiles.length; i++) {
-              id = consultaPerfiles[i]['id'] ?? '';
-              foto = consultaPerfiles[i]['foto'] ?? '';
-              correo = consultaPerfiles[i]['correo'] ?? '';
-              contrasena = consultaPerfiles[i]['contrasena'] ?? '';
-              nombre = consultaPerfiles[i]['nombre'] ?? '';
-              profesion = consultaPerfiles[i]['profesion'] ?? '';
-              direccion = consultaPerfiles[i]['direccion'] ?? '';
-              celular = consultaPerfiles[i]['celular'] ?? '';
+              var id = consultaPerfiles[i]['id'] ?? '';
+              var foto = consultaPerfiles[i]['foto'] ?? '';
+              var correo = consultaPerfiles[i]['correo'] ?? '';
+              var contrasena = consultaPerfiles[i]['contrasena'] ?? '';
+              var nombre = consultaPerfiles[i]['nombre'] ?? '';
+              var profesion = consultaPerfiles[i]['profesion'] ?? '';
+              var direccion = consultaPerfiles[i]['direccion'] ?? '';
+              var celular = consultaPerfiles[i]['celular'] ?? '';
               usuarios.add(UsersModel(
                   id: id,
                   foto: foto,
@@ -194,17 +194,17 @@ class _MainScreenState extends State<MainScreen> {
               precioFormateado =
                   NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               productos.add(ProductModel(
-                idProducto,
-                cantidadProducto,
-                catalogoProducto,
-                modeloProducto,
-                nombreProducto,
-                colorProducto,
-                tallaProducto,
-                categoriaProducto,
-                descripcionProducto,
-                valoracionProducto,
-                precioFormateado,
+                id: idProducto,
+                cantidad: cantidadProducto,
+                catalogo: catalogoProducto,
+                modelo: modeloProducto,
+                title: nombreProducto,
+                color: colorProducto,
+                talla: tallaProducto,
+                category: categoriaProducto,
+                description: descripcionProducto,
+                valoration: valoracionProducto,
+                price: precioFormateado,
               ));
             }
           } else {
@@ -223,17 +223,17 @@ class _MainScreenState extends State<MainScreen> {
               precioFormateado =
                   NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               productos.add(ProductModel(
-                idProducto,
-                cantidadProducto,
-                catalogoProducto,
-                modeloProducto,
-                nombreProducto,
-                colorProducto,
-                tallaProducto,
-                categoriaProducto,
-                descripcionProducto,
-                valoracionProducto,
-                precioFormateado,
+                id: idProducto,
+                cantidad: cantidadProducto,
+                catalogo: catalogoProducto,
+                modelo: modeloProducto,
+                title: nombreProducto,
+                color: colorProducto,
+                talla: tallaProducto,
+                category: categoriaProducto,
+                description: descripcionProducto,
+                valoration: valoracionProducto,
+                price: precioFormateado,
               ));
             });
           }
@@ -493,7 +493,7 @@ class _MainScreenState extends State<MainScreen> {
         alignment: Alignment.center,
         child: FutureBuilder(
           future: Future.delayed(
-              Duration(seconds: 4)), //Establece el tiempo de carga
+              Duration(seconds: 2)), //Establece el tiempo de carga
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Column(

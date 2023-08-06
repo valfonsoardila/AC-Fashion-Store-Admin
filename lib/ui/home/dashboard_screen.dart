@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:acfashion_store/domain/controller/controllerConectivity.dart';
 import 'package:acfashion_store/ui/models/favorite_model.dart';
 import 'package:acfashion_store/ui/models/notification_model.dart';
@@ -10,9 +9,9 @@ import 'package:acfashion_store/ui/styles/my_colors.dart';
 import 'package:acfashion_store/ui/models/product_model.dart';
 import 'package:acfashion_store/ui/models/assets_model.dart';
 import 'package:acfashion_store/ui/views/add_product_screen.dart';
-import 'package:acfashion_store/ui/views/summary_views/see_statistics_screen.dart';
 import 'package:acfashion_store/ui/views/home_screen.dart';
 import 'package:acfashion_store/ui/views/settings_screen.dart';
+import 'package:acfashion_store/ui/views/whatsapp_screen.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -96,6 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   List<ProductModel> colors = [];
   List<UsersModel> usuarios = [];
   List<NotificationModel> notifications = [];
+  List<ProductModel> productosGestionados = [];
   bool _isDarkMode = false;
 
   List<ProductModel> generateProducts() {
@@ -268,6 +268,15 @@ class _DashboardScreenState extends State<DashboardScreen>
     print("Nueva lista de favoritos en el dash: $productosFavoritos");
   }
 
+  void obtenerProductoSeleccionado(List<ProductModel> productosR) {
+    this.productosGestionados = productosR;
+    productos = productosGestionados;
+  }
+
+  void obtenerProductoAgregado(List<ProductModel> productosAgregados) {
+    this.productos = productosAgregados;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -348,12 +357,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
     final List<Widget> _widgetOptions = <Widget>[
       HomeScreen(
-          usuarios: usuarios,
-          pedidos: pedidos,
-          compras: compras,
-          productos: productos),
-      AddProductScreen(),
-      SeeStatisticsScreen(),
+        usuarios: usuarios,
+        pedidos: pedidos,
+        compras: compras,
+        productos: productos,
+        productosGestionados: obtenerProductoSeleccionado,
+      ),
+      AddProductScreen(
+        productosAgregados: obtenerProductoAgregado,
+      ),
+      WhatsappScreen(),
       SettingsScreen(),
     ];
     return AnimatedContainer(

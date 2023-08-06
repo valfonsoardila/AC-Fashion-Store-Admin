@@ -18,8 +18,14 @@ class HomeScreen extends StatefulWidget {
   final compras;
   final productos;
   final usuarios;
+  final productosGestionados;
   HomeScreen(
-      {super.key, this.pedidos, this.compras, this.productos, this.usuarios});
+      {super.key,
+      this.pedidos,
+      this.compras,
+      this.productos,
+      this.usuarios,
+      this.productosGestionados});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -30,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PurchasesModel> compras = [];
   List<ProductModel> productos = [];
   List<UsersModel> usuarios = [];
+  List<ProductModel> productosGestonados = [];
   List<Color> gradientColors = [
     Color(0xff23b6e6),
     Color(0xff02d39a),
@@ -56,6 +63,18 @@ class _HomeScreenState extends State<HomeScreen> {
     const Color.fromARGB(255, 89, 2, 59),
     Color.fromARGB(255, 92, 5, 62),
   ];
+  //Callback para retornar el producto seleccionado
+  retornoProducto(List<ProductModel> productos) {
+    widget.productosGestionados(productos);
+  }
+
+  void obtenerProductoSeleccionado(List<ProductModel> producto) {
+    this.productosGestonados = producto;
+    setState(() {
+      productos = productosGestonados;
+    });
+    retornoProducto(productosGestonados);
+  }
 
   @override
   void initState() {
@@ -393,9 +412,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         show: false,
                                       ),
                                       titlesData: FlTitlesData(
-                                          show: true,
-                                          topTitles: AxisTitles(
-                                            axisNameWidget: Text(
+                                        show: true,
+                                        topTitles: AxisTitles(
+                                          axisNameSize: 22,
+                                          axisNameWidget: Container(
+                                            child: Text(
                                               "Ingresos mensuales",
                                               style: TextStyle(
                                                   fontSize: 18,
@@ -404,47 +425,217 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ? Colors.white
                                                       : Colors.black),
                                             ),
-                                            drawBelowEverything: true,
-                                            axisNameSize: 16,
-                                            sideTitles: SideTitles(
-                                              reservedSize: 20,
-                                              interval: 1,
-                                              showTitles: true,
-                                              getTitlesWidget: (value, _) {
-                                                // Aquí agregamos un segundo argumento 'meta'
-                                                switch (value.toInt()) {
-                                                  case 0:
-                                                    return Text("Ene");
-                                                  case 1:
-                                                    return Text("Feb");
-                                                  case 2:
-                                                    return Text("Mar");
-                                                  case 3:
-                                                    return Text("Abr");
-                                                  case 4:
-                                                    return Text("May");
-                                                  case 5:
-                                                    return Text("Jun");
-                                                  case 6:
-                                                    return Text("Jul");
-                                                  case 7:
-                                                    return Text("Ago");
-                                                  case 8:
-                                                    return Text("Sep");
-                                                  case 9:
-                                                    return Text("Oct");
-                                                  case 10:
-                                                    return Text("Nov");
-                                                  case 11:
-                                                    return Text("Dic");
-                                                  default:
-                                                    return Text(
-                                                        ""); // Devolvemos un widget vacío en caso de que no haya una coincidencia
-                                                }
-                                              },
+                                          ),
+                                          sideTitles: SideTitles(
+                                            showTitles: false,
+                                            interval: 1,
+                                          ),
+                                        ),
+                                        bottomTitles: AxisTitles(
+                                          axisNameSize: 18,
+                                          axisNameWidget: Container(
+                                            child: Text(
+                                              "Meses del año",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black),
                                             ),
                                           ),
-                                          rightTitles: AxisTitles()),
+                                          drawBelowEverything: true,
+                                          sideTitles: SideTitles(
+                                            reservedSize: 30,
+                                            interval: 1,
+                                            showTitles: true,
+                                            getTitlesWidget: (value, index) {
+                                              // Aquí agregamos un segundo argumento 'meta'
+                                              switch (value.toInt()) {
+                                                case 0:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Ene",
+                                                    ),
+                                                  );
+                                                case 1:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Feb",
+                                                    ),
+                                                  );
+                                                case 2:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Mar",
+                                                    ),
+                                                  );
+                                                case 3:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Abr",
+                                                    ),
+                                                  );
+                                                case 4:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "May",
+                                                    ),
+                                                  );
+                                                case 5:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Jun",
+                                                    ),
+                                                  );
+                                                case 6:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Jul",
+                                                    ),
+                                                  );
+                                                case 7:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Ago",
+                                                    ),
+                                                  );
+                                                case 8:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Sep",
+                                                    ),
+                                                  );
+                                                case 9:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Oct",
+                                                    ),
+                                                  );
+                                                case 10:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Nov",
+                                                    ),
+                                                  );
+                                                case 11:
+                                                  return Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 7,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      "Dic",
+                                                    ),
+                                                  );
+                                                default:
+                                                  return Text(
+                                                      ""); // Devolvemos un widget vacío en caso de que no haya una coincidencia
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        leftTitles: AxisTitles(
+                                          axisNameSize: 18,
+                                          axisNameWidget: Container(
+                                            child: Text(
+                                              "Ingresos",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: _isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black),
+                                            ),
+                                          ),
+                                          drawBelowEverything: true,
+                                          sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 32,
+                                              interval: 1,
+                                              getTitlesWidget: (value, meta) {
+                                                switch (value.toInt()) {
+                                                  case 0:
+                                                    return Text("0.5m");
+                                                  case 1:
+                                                    return Text("1m");
+                                                  case 2:
+                                                    return Text("1.5m");
+                                                  case 3:
+                                                    return Text("2m");
+                                                  case 4:
+                                                    return Text("2.5m");
+                                                  case 5:
+                                                    return Text("3m");
+                                                  case 6:
+                                                    return Text("3.5m");
+                                                  case 7:
+                                                    return Text("4m");
+                                                  case 8:
+                                                    return Text("4.5m");
+                                                  case 9:
+                                                    return Text("5m");
+                                                  case 10:
+                                                    return Text("5.5m");
+                                                  case 11:
+                                                    return Text("6m");
+                                                  default:
+                                                    return Text("");
+                                                }
+                                              } // Aquí agregamos un segundo argumento 'meta'
+                                              ),
+                                        ),
+                                        rightTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: false,
+                                            interval: 1,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                     duration:
                                         Duration(milliseconds: 150), // Optional
@@ -656,7 +847,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SeeProductsScreen()),
+                                    builder: (context) => SeeProductsScreen(
+                                          productos: productos,
+                                          productoAgestionar:
+                                              obtenerProductoSeleccionado,
+                                        )),
                               );
                             },
                             child: Row(
