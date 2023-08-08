@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:acfashion_store/ui/auth/perfil.dart';
 import 'package:acfashion_store/ui/models/orders_model.dart';
 import 'package:acfashion_store/ui/models/product_model.dart';
 import 'package:acfashion_store/ui/models/purchases_model.dart';
@@ -1125,76 +1126,91 @@ class _HomeScreenState extends State<HomeScreen> {
                                             BorderRadius.circular(15.0),
                                       ),
                                       color: colorFondo,
-                                      child: Container(
-                                        alignment: Alignment.topLeft,
-                                        padding: EdgeInsets.only(
-                                          top: 5,
-                                          left: 5,
-                                          right: 5,
-                                          bottom: 5,
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Usuario ${usuarios.indexOf(usuarios[index]) + 1}",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  " - Tel: ${usuarios[index].celular}",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => Perfil(
+                                                perfil: usuarios[index],
+                                              ),
                                             ),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                usuarios[index].foto != ''
-                                                    ? CircleAvatar(
-                                                        radius: 20,
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                          usuarios[index].foto,
-                                                        ),
-                                                      )
-                                                    : CircleAvatar(
-                                                        radius: 20,
-                                                        backgroundImage:
-                                                            AssetImage(
-                                                          "assets/images/user.png",
-                                                        ),
-                                                      ),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Text(
-                                                  usuarios[index].nombre,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.white,
+                                          );
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.topLeft,
+                                          padding: EdgeInsets.only(
+                                            top: 5,
+                                            left: 5,
+                                            right: 5,
+                                            bottom: 5,
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Usuario ${usuarios.indexOf(usuarios[index]) + 1}",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                  Text(
+                                                    " - Tel: ${usuarios[index].celular}",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  usuarios[index].foto != ''
+                                                      ? CircleAvatar(
+                                                          radius: 20,
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                            usuarios[index]
+                                                                .foto,
+                                                          ),
+                                                        )
+                                                      : CircleAvatar(
+                                                          radius: 20,
+                                                          backgroundImage:
+                                                              AssetImage(
+                                                            "assets/images/user.png",
+                                                          ),
+                                                        ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    usuarios[index].nombre,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:acfashion_store/domain/controller/controllerUserPerfil.dart';
 import 'package:acfashion_store/domain/controller/controllerUserAuth.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
+import 'package:acfashion_store/ui/models/users_model.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class Perfil extends StatefulWidget {
-  Perfil({super.key});
+  final perfil;
+  Perfil({super.key, this.perfil});
 
   @override
   State<Perfil> createState() => _PerfilState();
@@ -19,6 +21,7 @@ class Perfil extends StatefulWidget {
 class _PerfilState extends State<Perfil> {
   ControlUserPerfil controlup = Get.find();
   ControlUserAuth controlua = Get.find();
+  TextEditingController controlFoto = TextEditingController();
   TextEditingController controlNombre = TextEditingController();
   TextEditingController controlUser = TextEditingController();
   TextEditingController controlPass = TextEditingController();
@@ -28,6 +31,7 @@ class _PerfilState extends State<Perfil> {
   TextEditingController controlCelular = TextEditingController();
   ImagePicker picker = ImagePicker(); // Lista de opciones
   List<String> registroSesion = [];
+  List<UsersModel> _listaPerfil = [];
   String generoSeleccionado =
       'Masculino'; // Variable de estado para almacenar el valor seleccionado del género
   var generos = <String>[
@@ -80,12 +84,25 @@ class _PerfilState extends State<Perfil> {
   void initState() {
     super.initState();
     _initConnectivity();
-    final args =
-        Get.arguments; // Obtener los argumentos pasados desde la vista anterior
-    registroSesion = args ?? "";
-    controlNombre.text = registroSesion[0];
-    controlUser.text = registroSesion[1];
-    controlPass.text = registroSesion[2];
+    if (Get.arguments != null) {
+      print("argumentos diferentes de null");
+      registroSesion = Get.arguments;
+      controlNombre.text = registroSesion[0];
+      controlUser.text = registroSesion[1];
+    }
+    if (widget.perfil != null) {
+      _listaPerfil.add(widget.perfil);
+      print("Map del perfil: $_listaPerfil");
+      setState(() {
+        controlFoto.text = _listaPerfil[0].foto;
+        controlNombre.text = _listaPerfil[0].nombre;
+        controlUser.text = _listaPerfil[0].correo;
+        controlPass.text = _listaPerfil[0].contrasena;
+        controlProfesion.text = _listaPerfil[0].profesion;
+        controlDireccion.text = _listaPerfil[0].direccion;
+        controlCelular.text = _listaPerfil[0].celular;
+      });
+    }
   }
 
   @override
@@ -143,6 +160,16 @@ class _PerfilState extends State<Perfil> {
                   children: <Widget>[
                     Column(
                       children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios),
+                              onPressed: () {
+                                Get.back();
+                              },
+                            ),
+                          ],
+                        ),
                         Text('Completa tu Perfil',
                             style: TextStyle(
                                 fontSize: 25,
@@ -171,10 +198,22 @@ class _PerfilState extends State<Perfil> {
                                         height: 100,
                                         fit: BoxFit.fitHeight,
                                       )
-                                    : Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.grey[800],
-                                      ),
+                                    : controlFoto.text != ''
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(80.0),
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                    controlFoto.text),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.grey[800],
+                                          ),
                               ),
                             ),
                           ),
@@ -263,33 +302,6 @@ class _PerfilState extends State<Perfil> {
                     ),
                     SizedBox(height: 8.0),
                     TextFormField(
-                      controller: controlCiudad,
-                      decoration: InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                              color: Color.fromARGB(255, 254, 12, 131)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                              color: _isDarkMode != false
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                        labelText: 'Ciudad',
-                        labelStyle: TextStyle(
-                            color: _isDarkMode != false
-                                ? Colors.white
-                                : Colors.black),
-                        prefixIcon: Icon(Icons.add_location,
-                            color: _isDarkMode != false
-                                ? Colors.white
-                                : Colors.black),
-                      ),
-                    ),
-                    SizedBox(height: 8.0),
-                    TextFormField(
                       controller: controlDireccion,
                       decoration: InputDecoration(
                         focusedBorder: OutlineInputBorder(
@@ -363,7 +375,7 @@ class _PerfilState extends State<Perfil> {
                               Icons.person, // Puedes cambiar el icono aquí
                               color: _isDarkMode != false
                                   ? Colors.white
-                                  : Color.fromARGB(255, 254, 12, 131),
+                                  : Colors.black,
                             ),
                           ),
                           Expanded(
