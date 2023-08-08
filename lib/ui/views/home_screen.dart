@@ -922,6 +922,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             "precio":
                                                 productoSeleccionado.price,
                                           };
+                                          print(productoSeleccionado);
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(

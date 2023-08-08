@@ -61,6 +61,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
     thousandSeparator: '.', // Separador de miles
     initialValue: 0, // Valor inicial (puedes cambiarlo según tus necesidades)
   );
+  String cleanCurrencyString() {
+    String formattedMoney = _moneyController.text.replaceAll(',00', '');
+    String cleanCurrency = formattedMoney.replaceAll('.', '');
+    return cleanCurrency;
+  }
+
   _galeria() async {
     XFile? image =
         await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
@@ -804,8 +810,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              _controllerPrecio.text =
-                                  _moneyController.text.replaceAll(',00', '');
+                              _controllerPrecio.text = cleanCurrencyString();
                               print('Editar');
                               FocusScope.of(context).unfocus();
                               if (_imageCatalogo != '' && _imageModelo != '') {
@@ -862,8 +867,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              _controllerPrecio.text =
-                                  _moneyController.text.replaceAll(',00', '');
+                              _controllerPrecio.text = cleanCurrencyString();
                               print('Eliminar');
                               FocusScope.of(context).unfocus();
                               var nuevoProducto = {
@@ -911,8 +915,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       )
                     : ElevatedButton(
                         onPressed: () {
-                          _controllerPrecio.text =
-                              _moneyController.text.replaceAll(',00', '');
+                          _controllerPrecio.text = cleanCurrencyString();
                           String cantidadText = _controllerCantidad.text;
                           int cantidadEntero = int.tryParse(cantidadText) ?? 0;
                           FocusScope.of(context).unfocus();

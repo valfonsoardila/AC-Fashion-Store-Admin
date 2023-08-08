@@ -5,6 +5,7 @@ import 'package:acfashion_store/ui/models/theme_model.dart';
 import 'package:acfashion_store/ui/styles/my_colors.dart';
 import 'package:acfashion_store/ui/views/add_product_screen.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:extended_masked_text/extended_masked_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class SeeProductsScreen extends StatefulWidget {
 
 class _SeeProductsScreenState extends State<SeeProductsScreen> {
   ControlConectividad controlconect = ControlConectividad();
+  TextEditingController _dineroFormateado = TextEditingController();
   bool _controllerconectivity = true;
   bool _isDarkMode = false;
   String _opcion = "";
@@ -406,7 +408,8 @@ class _SeeProductsScreenState extends State<SeeProductsScreen> {
                                           RichText(
                                             textAlign: TextAlign.center,
                                             text: TextSpan(
-                                                text: "\$ ${e.price}",
+                                                text:
+                                                    "\$ ${e.price.toString()}",
                                                 style: TextStyle(
                                                     color: _isDarkMode
                                                         ? Colors.white
@@ -443,6 +446,7 @@ class _SeeProductsScreenState extends State<SeeProductsScreen> {
                                         children: [
                                           TextButton(
                                               onPressed: () {
+                                                print(e.price);
                                                 var productoSeleccionado = {
                                                   'id': e.id,
                                                   'imageCatalogo': e.catalogo,
