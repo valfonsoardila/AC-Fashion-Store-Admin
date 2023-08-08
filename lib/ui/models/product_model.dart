@@ -9,7 +9,7 @@ class ProductModel {
   String category;
   String description;
   String valoration;
-  String price;
+  int price;
 
   ProductModel({
     this.id,

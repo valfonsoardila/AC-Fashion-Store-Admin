@@ -5,12 +5,14 @@ import 'package:acfashion_store/ui/models/purchases_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
 import 'package:acfashion_store/ui/models/users_model.dart';
 import 'package:acfashion_store/ui/styles/my_colors.dart';
+import 'package:acfashion_store/ui/views/add_product_screen.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_orders_screen.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_products_screens.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_statistics_screen.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -895,119 +897,157 @@ class _HomeScreenState extends State<HomeScreen> {
                                             BorderRadius.circular(15.0),
                                       ),
                                       color: colorFondo,
-                                      child: Container(
-                                        alignment: Alignment.topLeft,
-                                        padding: EdgeInsets.only(
-                                            top: 5,
-                                            left: 5,
-                                            right: 5,
-                                            bottom: 5),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Producto ${productos.indexOf(productos[index]) + 1}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.star,
-                                                      color: Colors.white,
-                                                      size: 14,
-                                                    ),
-                                                    Text(
-                                                      " ${productos[index].valoration}",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.white),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  "Cantidad ${productos[index].cantidad}",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white),
-                                                ),
-                                              ],
+                                      child: InkWell(
+                                        onTap: () {
+                                          var productoSeleccionado =
+                                              productos[index];
+                                          var productoMapeado = {
+                                            "id": productoSeleccionado.id,
+                                            "cantidad":
+                                                productoSeleccionado.cantidad,
+                                            "imageCatalogo":
+                                                productoSeleccionado.catalogo,
+                                            "imageModelo":
+                                                productoSeleccionado.modelo,
+                                            "nombre":
+                                                productoSeleccionado.title,
+                                            "color": productoSeleccionado.color,
+                                            "talla": productoSeleccionado.talla,
+                                            "categoria":
+                                                productoSeleccionado.category,
+                                            "descripcion": productoSeleccionado
+                                                .description,
+                                            "valoracion":
+                                                productoSeleccionado.valoration,
+                                            "precio":
+                                                productoSeleccionado.price,
+                                          };
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddProductScreen(
+                                                producto: productoMapeado,
+                                              ),
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      radius: 15,
-                                                      backgroundImage:
-                                                          NetworkImage(
-                                                              productos[index]
-                                                                  .catalogo),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    Text(
-                                                      productos[index].title,
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.white),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'Talla: ',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                                Text(
-                                                  productos[index].talla,
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.white),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Text(
-                                                  "Categoria del producto: ",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white),
-                                                ),
-                                                Text(
-                                                  "${productos[index].category}",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white),
-                                                ),
-                                              ],
-                                            )
-                                          ],
+                                          );
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.topLeft,
+                                          padding: EdgeInsets.only(
+                                              top: 5,
+                                              left: 5,
+                                              right: 5,
+                                              bottom: 5),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Producto ${productos.indexOf(productos[index]) + 1}",
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.star,
+                                                        color: Colors.white,
+                                                        size: 14,
+                                                      ),
+                                                      Text(
+                                                        " ${productos[index].valoration}",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    "Cantidad ${productos[index].cantidad}",
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        radius: 15,
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                                productos[index]
+                                                                    .catalogo),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        productos[index].title,
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'Talla: ',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  Text(
+                                                    productos[index].talla,
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors.white),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    "Categoria del producto: ",
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white),
+                                                  ),
+                                                  Text(
+                                                    "${productos[index].category}",
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.white),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

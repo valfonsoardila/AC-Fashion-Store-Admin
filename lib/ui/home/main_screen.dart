@@ -39,15 +39,6 @@ class _MainScreenState extends State<MainScreen> {
   String msg = "";
   int tiempoDeintento = 5;
   String precioFormateado = "";
-  //VARIABLES DE PERFIL
-  var id = "";
-  var foto = "";
-  var correo = "";
-  var contrasena = "";
-  var nombre = "";
-  var profesion = "";
-  var direccion = "";
-  var celular = "";
   //VARIABLES PRODUCTOS
   var idProducto = "";
   var cantidadProducto = 0;
@@ -59,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
   var tallaProducto = "";
   var categoriaProducto = "";
   var valoracionProducto = "";
-  var precioProducto = 0.0;
+  var precioProducto = 0;
   //LISTAS
   List<Map<String, dynamic>> consultaPerfiles = [];
   List<Map<String, dynamic>> consultaProductos = [];
@@ -96,17 +87,10 @@ class _MainScreenState extends State<MainScreen> {
         msg = controluserperfil.mensajesPerfil;
       });
       if (msg == "Proceso exitoso") {
+        print("Datos de perfil recibidos en MainScreen: $perfil");
         setState(() {
           perfil = controluserperfil.datosPerfil;
-          id = perfil['id'] ?? '';
-          foto = perfil['foto'] ?? '';
-          correo = perfil['correo'] ?? '';
-          contrasena = perfil['contrasena'] ?? '';
-          nombre = perfil['nombre'] ?? '';
-          profesion = perfil['profesion'] ?? '';
-          direccion = perfil['direccion'] ?? '';
-          celular = perfil['celular'] ?? '';
-          print("Datos perfil recibidos en MainScreen: $perfil");
+          print("Datos de perfil recibidos en MainScreen: $perfil");
         });
       } else {
         print("Error al cargar datos del perfil");
@@ -143,14 +127,14 @@ class _MainScreenState extends State<MainScreen> {
             }
           } else {
             consultaPerfiles.forEach((element) {
-              id = element['id'] ?? '';
-              foto = element['foto'] ?? '';
-              correo = element['correo'] ?? '';
-              contrasena = element['contrasena'] ?? '';
-              nombre = element['nombre'] ?? '';
-              profesion = element['profesion'] ?? '';
-              direccion = element['direccion'] ?? '';
-              celular = element['celular'] ?? '';
+              var id = element['id'] ?? '';
+              var foto = element['foto'] ?? '';
+              var correo = element['correo'] ?? '';
+              var contrasena = element['contrasena'] ?? '';
+              var nombre = element['nombre'] ?? '';
+              var profesion = element['profesion'] ?? '';
+              var direccion = element['direccion'] ?? '';
+              var celular = element['celular'] ?? '';
               print("Foto recibida en el MainScreen: $foto");
               usuarios.add(UsersModel(
                   id: id,
@@ -190,9 +174,9 @@ class _MainScreenState extends State<MainScreen> {
               tallaProducto = consultaProductos[i]['talla'] ?? '';
               categoriaProducto = consultaProductos[i]['categoria'] ?? '';
               valoracionProducto = consultaProductos[i]['valoracion'] ?? '';
-              precioProducto = consultaProductos[i]['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
+              precioProducto = consultaProductos[i]['precio'] ?? 0;
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               productos.add(ProductModel(
                 id: idProducto,
                 cantidad: cantidadProducto,
@@ -204,7 +188,7 @@ class _MainScreenState extends State<MainScreen> {
                 category: categoriaProducto,
                 description: descripcionProducto,
                 valoration: valoracionProducto,
-                price: precioFormateado,
+                price: precioProducto,
               ));
             }
           } else {
@@ -220,8 +204,8 @@ class _MainScreenState extends State<MainScreen> {
               categoriaProducto = element['categoria'] ?? '';
               valoracionProducto = element['valoracion'] ?? '';
               precioProducto = element['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               productos.add(ProductModel(
                 id: idProducto,
                 cantidad: cantidadProducto,
@@ -233,7 +217,7 @@ class _MainScreenState extends State<MainScreen> {
                 category: categoriaProducto,
                 description: descripcionProducto,
                 valoration: valoracionProducto,
-                price: precioFormateado,
+                price: precioProducto,
               ));
             });
           }
@@ -262,8 +246,8 @@ class _MainScreenState extends State<MainScreen> {
               categoriaProducto = consultaFavoritos[i]['categoria'] ?? '';
               valoracionProducto = consultaFavoritos[i]['valoracion'] ?? '';
               precioProducto = consultaFavoritos[i]['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               idProducto = consultaFavoritos[i]['id'] ?? '';
               favoritos.add(FavoriteModel(
                   idUsuario,
@@ -275,7 +259,7 @@ class _MainScreenState extends State<MainScreen> {
                   tallaProducto,
                   categoriaProducto,
                   valoracionProducto,
-                  precioFormateado,
+                  precioProducto,
                   idProducto));
             }
           } else {
@@ -290,8 +274,8 @@ class _MainScreenState extends State<MainScreen> {
               categoriaProducto = element['categoria'] ?? '';
               valoracionProducto = element['valoracion'] ?? '';
               precioProducto = element['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precioProducto * 1000);
               idProducto = element['id'] ?? '';
               favoritos.add(FavoriteModel(
                   idUsuario,
@@ -303,7 +287,7 @@ class _MainScreenState extends State<MainScreen> {
                   tallaProducto,
                   categoriaProducto,
                   valoracionProducto,
-                  precioFormateado,
+                  precioProducto,
                   idProducto));
             });
           }
@@ -334,9 +318,9 @@ class _MainScreenState extends State<MainScreen> {
               var talla = consultaFavoritos[i]['talla'] ?? '';
               var categoria = consultaFavoritos[i]['categoria'] ?? '';
               var valoracion = consultaFavoritos[i]['valoracion'] ?? '';
-              var precio = consultaFavoritos[i]['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precio * 1000);
+              var precio = consultaFavoritos[i]['precio'] ?? 0;
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precio * 1000);
               compras.add(PurchasesModel(
                 uid,
                 iduser,
@@ -366,8 +350,8 @@ class _MainScreenState extends State<MainScreen> {
               var categoria = element['categoria'] ?? '';
               var valoracion = element['valoracion'] ?? '';
               var precio = element['precio'] ?? '0.0';
-              precioFormateado =
-                  NumberFormat("#,###", "es_CO").format(precio * 1000);
+              // precioFormateado =
+              //     NumberFormat("#,###", "es_CO").format(precio * 1000);
               compras.add(PurchasesModel(
                 uid,
                 iduser,
@@ -596,28 +580,29 @@ class _MainScreenState extends State<MainScreen> {
                 );
               } else {
                 if (perfil.isNotEmpty) {
+                  print("Perfil: $perfil");
                   return Scaffold(
                     body: Stack(
                       children: [
                         DrawerScreen(
-                          uid: id,
-                          nombre: nombre,
-                          correo: correo,
-                          contrasena: contrasena,
-                          celular: celular,
-                          direccion: direccion,
-                          foto: foto,
-                          profesion: profesion,
+                          uid: perfil['id'],
+                          nombre: perfil['nombre'],
+                          correo: perfil['correo'],
+                          contrasena: perfil['contrasena'],
+                          celular: perfil['celular'],
+                          direccion: perfil['direccion'],
+                          foto: perfil['foto'],
+                          profesion: perfil['profesion'],
                         ),
                         DashboardScreen(
-                          id: id,
-                          nombre: nombre,
-                          correo: correo,
-                          contrasena: contrasena,
-                          foto: foto,
-                          profesion: profesion,
-                          direccion: direccion,
-                          celular: celular,
+                          id: perfil['id'],
+                          nombre: perfil['nombre'],
+                          correo: perfil['correo'],
+                          contrasena: perfil['contrasena'],
+                          celular: perfil['celular'],
+                          direccion: perfil['direccion'],
+                          foto: perfil['foto'],
+                          profesion: perfil['profesion'],
                           usuarios: usuarios,
                           productos: productos,
                           favoritos: favoritos,
