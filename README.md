@@ -4,9 +4,11 @@
 
 ## Administrador de tienda ropa móvil con base de datos relacional
 <div style="display: flex; flex-direction: row;">
-  <div align="center" width="300">
-    <p><strong>`Drawer Screen`</strong></p>
+  <div width="300">
+    <div align="center">
+      <p><strong>`Drawer Screen`</strong></p>
     <img src="https://github.com/VictorArdila/AC-Fashion-Store-Admin/assets/89551043/ea2d4c06-fce3-495a-b8c3-8a52f3f86c50" alt="Drawer Screen" width="300">
+    </div>
   </div>
   
   <div style="flex-direction: column; align-items: center;">
