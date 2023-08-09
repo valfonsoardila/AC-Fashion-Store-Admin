@@ -3,7 +3,7 @@
 ![logo](https://github.com/VictorArdila/AC-Fashion-Store-Admin/assets/89551043/274a4a08-0057-4850-b93a-4565da1ad03a)
 
 ## Administrador de tienda ropa móvil con base de datos relacional
-<div style="display: flex; flex-direction: row;">
+<div style="display: inline;">
 <div align="center">
   <p><strong>Drawer Screen</strong></p>
   <img src="https://github.com/VictorArdila/AC-Fashion-Store-Admin/assets/89551043/ea2d4c06-fce3-495a-b8c3-8a52f3f86c50" alt="Drawer Screen" width="300">
