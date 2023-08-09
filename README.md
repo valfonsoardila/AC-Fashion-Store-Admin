@@ -4,7 +4,7 @@
 
 ## Administrador de tienda ropa móvil con base de datos relacional
 <div style="display: inline;">
-  <div>
+  <div style="display: column;">
     <img src="https://github.com/VictorArdila/AC-Fashion-Store-Admin/assets/89551043/ea2d4c06-fce3-495a-b8c3-8a52f3f86c50" alt="Imagen 1" width="250">
   </div>
   <div>
