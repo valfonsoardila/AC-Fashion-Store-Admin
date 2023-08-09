@@ -4,7 +4,7 @@
 
 ## Administrador de tienda ropa móvil con base de datos relacional
 <div style="display: inline;">
-  <div>
+  <div style="flex-direction: column; align-items: center;">
     
   </div>
   <div style="flex-direction: column; align-items: center;">
