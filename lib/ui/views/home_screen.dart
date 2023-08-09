@@ -670,7 +670,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SeeOrdersScreen()),
+                                    builder: (context) => SeeOrdersScreen(
+                                          pedidos: pedidos,
+                                        )),
                               );
                             },
                             child: Row(
@@ -1080,7 +1082,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SeeUsersScreen()),
+                                    builder: (context) => SeeUsersScreen(
+                                          usuarios: usuarios,
+                                        )),
                               );
                             },
                             child: Row(

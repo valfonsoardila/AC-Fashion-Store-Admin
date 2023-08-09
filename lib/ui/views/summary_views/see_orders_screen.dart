@@ -1,3 +1,4 @@
+import 'package:acfashion_store/ui/models/orders_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,13 @@ class SeeOrdersScreen extends StatefulWidget {
 
 class _SeeOrdersScreenState extends State<SeeOrdersScreen> {
   bool _isDarkMode = false;
+  List<OrdersModel> pedidos = [];
+  @override
+  void initState() {
+    super.initState();
+    pedidos = widget.pedidos;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeChanger>(context);
@@ -43,6 +51,118 @@ class _SeeOrdersScreenState extends State<SeeOrdersScreen> {
           )),
       body: Container(
         color: _isDarkMode ? Colors.black : Colors.white,
+        child: Expanded(
+          child: Container(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: pedidos.length,
+              itemBuilder: (BuildContext context, int index) {
+                Color colorFondo =
+                    _isDarkMode ? Colors.grey.shade900 : Colors.grey.shade300;
+                return Container(
+                  height: 100,
+                  width: MediaQuery.of(context).size.width,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    color: colorFondo,
+                    child: Container(
+                      alignment: Alignment.topLeft,
+                      padding:
+                          EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Pedido ${pedidos.indexOf(pedidos[index]) + 1}",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                " - ${pedidos[index].fechaDeCompra}",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                " - ${pedidos[index].horaDeCompra}",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 10,
+                              ),
+                              pedidos[index].foto != ''
+                                  ? CircleAvatar(
+                                      radius: 12,
+                                      backgroundImage:
+                                          NetworkImage(pedidos[index].foto),
+                                    )
+                                  : CircleAvatar(
+                                      radius: 12,
+                                      backgroundImage: AssetImage(
+                                        "assets/images/user.png",
+                                      ),
+                                    ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                pedidos[index].nombre,
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                              Text(
+                                pedidos[index].estado,
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                "Cantidad de productos: ",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                "${pedidos[index].cantidad}",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }
