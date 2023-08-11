@@ -12,6 +12,13 @@ class ControlCompra extends GetxController {
     return _response.value;
   }
 
+  Future<List<Map<String, dynamic>>> filtrarCompras(String id) async {
+    print("id en el controlador: $id");
+    _response.value = await PeticionesCompra.filtrarCompras(id);
+    await controlCompra(_response.value);
+    return _response.value;
+  }
+
   Future<List<Map<String, dynamic>>> obtenerCompras() async {
     _response.value = await PeticionesCompra.obtenerCompras();
     await controlCompra(_response.value);

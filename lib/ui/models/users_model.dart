@@ -4,7 +4,9 @@ class UsersModel {
   String correo;
   String contrasena;
   String nombre;
+  String genero;
   String profesion;
+  String ciudad;
   String direccion;
   String celular;
 
@@ -14,7 +16,9 @@ class UsersModel {
       required this.correo,
       required this.contrasena,
       required this.nombre,
+      required this.genero,
       required this.profesion,
+      required this.ciudad,
       required this.direccion,
       required this.celular});
 
@@ -25,7 +29,9 @@ class UsersModel {
         correo: json['correo'],
         contrasena: json['contrasena'],
         nombre: json['nombre'],
+        genero: json['genero'],
         profesion: json['profesion'],
+        ciudad: json['ciudad'],
         direccion: json['created_at'],
         celular: json['updated_at']);
   }

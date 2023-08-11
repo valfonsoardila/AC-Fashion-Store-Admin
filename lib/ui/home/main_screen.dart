@@ -112,7 +112,9 @@ class _MainScreenState extends State<MainScreen> {
               var correo = consultaPerfiles[i]['correo'] ?? '';
               var contrasena = consultaPerfiles[i]['contrasena'] ?? '';
               var nombre = consultaPerfiles[i]['nombre'] ?? '';
+              var genero = consultaPerfiles[i]['genero'] ?? '';
               var profesion = consultaPerfiles[i]['profesion'] ?? '';
+              var ciudad = consultaPerfiles[i]['ciudad'] ?? '';
               var direccion = consultaPerfiles[i]['direccion'] ?? '';
               var celular = consultaPerfiles[i]['celular'] ?? '';
               usuarios.add(UsersModel(
@@ -121,7 +123,9 @@ class _MainScreenState extends State<MainScreen> {
                   correo: correo,
                   contrasena: contrasena,
                   nombre: nombre,
+                  genero: genero,
                   profesion: profesion,
+                  ciudad: ciudad,
                   direccion: direccion,
                   celular: celular));
             }
@@ -132,8 +136,10 @@ class _MainScreenState extends State<MainScreen> {
               var correo = element['correo'] ?? '';
               var contrasena = element['contrasena'] ?? '';
               var nombre = element['nombre'] ?? '';
+              var genero = element['genero'] ?? '';
               var profesion = element['profesion'] ?? '';
               var direccion = element['direccion'] ?? '';
+              var ciudad = element['ciudad'] ?? '';
               var celular = element['celular'] ?? '';
               print("Foto recibida en el MainScreen: $foto");
               usuarios.add(UsersModel(
@@ -142,7 +148,9 @@ class _MainScreenState extends State<MainScreen> {
                   correo: correo,
                   contrasena: contrasena,
                   nombre: nombre,
+                  genero: genero,
                   profesion: profesion,
+                  ciudad: ciudad,
                   direccion: direccion,
                   celular: celular));
             });
@@ -391,7 +399,7 @@ class _MainScreenState extends State<MainScreen> {
                     var iduser = consultaPedidos[i]['iduser'] ?? '';
                     var nombre = consultaPedidos[i]['nombre'] ?? '';
                     var correo = consultaPedidos[i]['correo'] ?? '';
-                    var telefono = consultaPedidos[i]['telefono'] ?? '';
+                    var telefono = consultaPedidos[i]['celular'] ?? '';
                     var direccion = consultaPedidos[i]['direccion'] ?? '';
                     var foto = consultaPedidos[i]['foto'] ?? '';
                     var cantidad = consultaPedidos[i]['cantidad'] ?? 0;
@@ -402,6 +410,8 @@ class _MainScreenState extends State<MainScreen> {
                     var estado = consultaPedidos[i]['estadoEntrega'] ?? '';
                     var tiempoDeEntrega =
                         consultaPedidos[i]['tiempoDeEntrega'] ?? '';
+                    print("Celular recibido: $telefono");
+                    print("Estado de entrega recibido: $estado");
                     pedidos.add(
                       OrdersModel(
                         uid,
@@ -427,7 +437,7 @@ class _MainScreenState extends State<MainScreen> {
                     var iduser = element['iduser'] ?? '';
                     var nombre = element['nombre'] ?? '';
                     var correo = element['correo'] ?? '';
-                    var telefono = element['telefono'] ?? '';
+                    var telefono = element['celular'] ?? '';
                     var direccion = element['direccion'] ?? '';
                     var foto = element['foto'] ?? '';
                     var cantidad = element['cantidad'] ?? 0;
@@ -435,7 +445,7 @@ class _MainScreenState extends State<MainScreen> {
                     var metodoPago = element['metodoPago'] ?? '';
                     var fechaDeCompra = element['fechaCompra'] ?? '';
                     var horaDeCompra = element['horaCompra'] ?? '';
-                    var estado = element['estado'] ?? '';
+                    var estado = element['estadoEntrega'] ?? '';
                     var tiempoDeEntrega = element['tiempoEntrega'] ?? '';
                     pedidos.add(
                       OrdersModel(

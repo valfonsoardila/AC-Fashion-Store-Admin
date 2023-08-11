@@ -26,7 +26,26 @@ class PeticionesCompra {
       final responseCompra = await _client.from(tableNameCompra).select('*');
       if (responseCompra.isNotEmpty) {
         compras = List<Map<String, dynamic>>.from(responseCompra);
-        print("favoritos: $compras");
+        print("compras: $compras");
+      } else {
+        compras = [];
+      }
+      return compras;
+    } catch (error) {
+      print('Error en la operación de obtener compras: $error');
+      throw error;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> filtrarCompras(id) async {
+    List<Map<String, dynamic>> compras = [];
+    try {
+      final tableNameCompra = 'compra';
+      final responseCompra =
+          await _client.from(tableNameCompra).select('*').eq('idpedido', id);
+      if (responseCompra.isNotEmpty) {
+        compras = List<Map<String, dynamic>>.from(responseCompra);
+        print("compras: $compras");
       } else {
         compras = [];
       }

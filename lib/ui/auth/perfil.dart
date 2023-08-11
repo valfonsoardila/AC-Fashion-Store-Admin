@@ -99,8 +99,10 @@ class _PerfilState extends State<Perfil> {
         controlUser.text = _listaPerfil[0].correo;
         controlPass.text = _listaPerfil[0].contrasena;
         controlProfesion.text = _listaPerfil[0].profesion;
+        controlCiudad.text = _listaPerfil[0].ciudad;
         controlDireccion.text = _listaPerfil[0].direccion;
         controlCelular.text = _listaPerfil[0].celular;
+        generoSeleccionado = _listaPerfil[0].genero;
       });
     }
   }
@@ -161,6 +163,7 @@ class _PerfilState extends State<Perfil> {
                     Column(
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
                               icon: Icon(Icons.arrow_back_ios),
@@ -295,6 +298,33 @@ class _PerfilState extends State<Perfil> {
                                 ? Colors.white
                                 : Colors.black),
                         prefixIcon: Icon(Icons.psychology_rounded,
+                            color: _isDarkMode != false
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    TextFormField(
+                      controller: controlCiudad,
+                      decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 254, 12, 131)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                              color: _isDarkMode != false
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                        labelText: 'Ciudad',
+                        labelStyle: TextStyle(
+                            color: _isDarkMode != false
+                                ? Colors.white
+                                : Colors.black),
+                        prefixIcon: Icon(Icons.add_location,
                             color: _isDarkMode != false
                                 ? Colors.white
                                 : Colors.black),
