@@ -24,11 +24,25 @@ class ControlPedido extends GetxController {
     return _response.value;
   }
 
-  // Future<void> eliminarPedido(String id) async {
-  //   _response.value = await PeticionesPedido.eliminarPedido(id);
-  //   await controlPedido(_response.value);
-  //   return _response.value;
-  // }
+  Future<List<Map<String, dynamic>>> consultarPedidoEstado(
+      String estado) async {
+    _response.value = await PeticionesPedido.obtenerPedidoEstado(estado);
+    print("pedido del controlador: $_response");
+    await controlPedido(_response.value);
+    return _response.value;
+  }
+
+  Future<void> actualizarPedido(String id, Map<String, dynamic> pedido) async {
+    _response.value = await PeticionesPedido.actualizarPedido(id, pedido);
+    await controlPedido(_response.value);
+    return _response.value;
+  }
+
+  Future<void> eliminarPedido(String id) async {
+    _response.value = await PeticionesPedido.eliminarPedido(id);
+    await controlPedido(_response.value);
+    return _response.value;
+  }
 
   Future<void> controlPedido(dynamic respuesta) async {
     if (respuesta == null) {

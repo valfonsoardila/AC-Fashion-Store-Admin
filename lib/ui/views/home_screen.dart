@@ -739,6 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               pedidos[index],
                                                           productosPedido:
                                                               productosPedido,
+                                                          productos: productos,
                                                         )),
                                               );
                                             }
@@ -787,42 +788,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ],
                                               ),
                                               Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
-                                                  SizedBox(
-                                                    width: 10,
+                                                  Row(
+                                                    children: [
+                                                      pedidos[index].foto != ''
+                                                          ? CircleAvatar(
+                                                              radius: 12,
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                      pedidos[index]
+                                                                          .foto),
+                                                            )
+                                                          : CircleAvatar(
+                                                              radius: 12,
+                                                              backgroundImage:
+                                                                  AssetImage(
+                                                                "assets/images/user.png",
+                                                              ),
+                                                            ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        pedidos[index].nombre,
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  pedidos[index].foto != ''
-                                                      ? CircleAvatar(
-                                                          radius: 12,
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                                  pedidos[index]
-                                                                      .foto),
-                                                        )
-                                                      : CircleAvatar(
-                                                          radius: 12,
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                            "assets/images/user.png",
-                                                          ),
-                                                        ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  Text(
-                                                    pedidos[index].nombre,
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white),
-                                                  ),
-                                                  Text(
-                                                    pedidos[index].estado,
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white),
-                                                  ),
+                                                  Row(children: [
+                                                    Text(
+                                                      'Estado: ',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    Text(
+                                                      pedidos[index].estado,
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ]),
                                                 ],
                                               ),
                                               Row(

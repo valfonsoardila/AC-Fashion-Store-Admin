@@ -1,27 +1,43 @@
+import 'package:acfashion_store/domain/controller/controllerCompra.dart';
+import 'package:acfashion_store/domain/controller/controllerNotificacion.dart';
+import 'package:acfashion_store/domain/controller/controllerPedido.dart';
+import 'package:acfashion_store/domain/controller/controllerProducto.dart';
 import 'package:acfashion_store/ui/models/orders_model.dart';
 import 'package:acfashion_store/ui/models/product_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
 import 'package:acfashion_store/ui/styles/my_colors.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class OrdersScreen extends StatefulWidget {
   final pedido;
   final productosPedido;
-  OrdersScreen({super.key, this.pedido, this.productosPedido});
+  final productos;
+  OrdersScreen({super.key, this.pedido, this.productosPedido, this.productos});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
+  ControlProducto controlproducto = ControlProducto();
+  ControlCompra controlcompra = ControlCompra();
+  ControlPedido controlpedido = ControlPedido();
+  ControlNotificacion controlnotificacion = ControlNotificacion();
   bool _isDarkMode = false;
   List<OrdersModel> _pedido = [];
   List<ProductModel> _productosPedido = [];
+  List<ProductModel> _productosExistentes = [];
   String selectedId = "0";
 
   bool _controllerconectivity = false;
+  String getFormattedTime() {
+    var now = DateTime.now();
+    var formattedTime = DateFormat('h:mm a').format(now);
+    return formattedTime;
+  }
 
   void _initConnectivity() async {
     // Obtiene el estado de la conectividad al inicio
@@ -40,7 +56,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     });
   }
 
-  String selectedCategoryId = "0"; // ID de la categoría seleccionada
   List<Widget> buildProductsOrders() {
     final theme = Provider.of<ThemeChanger>(context);
     var temaActual = theme.getTheme();
@@ -50,7 +65,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
       _isDarkMode = false;
     }
     return _productosPedido.map((e) {
-      bool isSelected = selectedCategoryId == e.id;
       return Container(
         child: Card(
           borderOnForeground: false,
@@ -190,9 +204,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   void cargarProductos() {
-    if (widget.pedido != null && widget.productosPedido != null) {
-      print("Pedido: ${widget.pedido}");
+    if (widget.pedido != null &&
+        widget.productosPedido != null &&
+        widget.productos != null) {
       _pedido.add(widget.pedido);
+      _productosExistentes = widget.productos;
       widget.productosPedido.forEach((element) {
         var producto = {
           'id': element['idproducto'],
@@ -639,7 +655,75 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      var notificacion = {
+                                        'iduser': _pedido[0].idUser,
+                                        'titulo': "Pedido enviado",
+                                        'descripcion':
+                                            "Su pedido ha sido enviado exitosamente, Gracias por su compra.",
+                                        'tiempoEntrega':
+                                            _pedido[0].tiempoDeEntrega,
+                                        'estado': "Enviado",
+                                        'hora': '${getFormattedTime()}',
+                                        'fecha':
+                                            '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                                      };
+                                      for (int i = 0;
+                                          i < _productosPedido.length;
+                                          i++) {
+                                        if (_productosExistentes[i].id ==
+                                            _productosPedido[i].id) {
+                                          var producto = {
+                                            'id': _productosPedido[i].id,
+                                            'cantidad': _productosExistentes[i]
+                                                    .cantidad -
+                                                _productosPedido[i].cantidad,
+                                            'catalogo':
+                                                _productosPedido[i].catalogo,
+                                            'modelo':
+                                                _productosPedido[i].modelo,
+                                            'nombre': _productosPedido[i].title,
+                                            'color': _productosPedido[i].color,
+                                            'talla': _productosPedido[i].talla,
+                                            'categoria':
+                                                _productosPedido[i].category,
+                                            'descripcion':
+                                                _productosPedido[i].description,
+                                            'valoracion':
+                                                _productosPedido[i].valoration,
+                                            'precio': _productosPedido[i].price,
+                                          };
+                                          controlproducto.actualizarproducto(
+                                              producto,
+                                              _productosPedido[i].catalogo,
+                                              _productosPedido[i].modelo);
+                                        }
+                                      }
+                                      var pedido = {
+                                        'id': _pedido[0].id,
+                                        'idUser': _pedido[0].idUser,
+                                        'nombre': _pedido[0].nombre,
+                                        'correo': _pedido[0].correo,
+                                        'telefono': _pedido[0].telefono,
+                                        'direccion': _pedido[0].direccion,
+                                        'cantidad': _pedido[0].cantidad,
+                                        'total': _pedido[0].total,
+                                        'metodoPago': _pedido[0].metodoPago,
+                                        'fechaDeCompra':
+                                            _pedido[0].fechaDeCompra,
+                                        'horaDeCompra': _pedido[0].horaDeCompra,
+                                        'estado': "Enviado",
+                                        'tiempoDeEntrega':
+                                            _pedido[0].tiempoDeEntrega,
+                                      };
+                                      controlpedido.actualizarPedido(
+                                          _pedido[0].id, pedido);
+                                      _pedido.remove(_pedido[0]);
+                                      controlnotificacion
+                                          .actualizarNotificacion(notificacion)
+                                          .then((value) =>
+                                              Navigator.of(context).pop());
+                                    },
                                     child: Container(
                                       child: Text(
                                         "Enviar📦",
@@ -655,7 +739,44 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     ),
                                   ),
                                   ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      DateTime now = DateTime.now();
+                                      var notificacion = {
+                                        'iduser': _pedido[0].idUser,
+                                        'titulo': "Su Pedido se ha retrasado",
+                                        'descripcion':
+                                            "Su pedido se ha retrasado, lamentamos los inconvenientes. Estamos trabajando para solucionarlo.",
+                                        'tiempoEntrega':
+                                            _pedido[0].tiempoDeEntrega,
+                                        'estado': "Retrasado",
+                                        'hora': DateFormat('HH:mm').format(now),
+                                        'fecha': DateFormat('dd-MM-yyyy')
+                                            .format(now),
+                                      };
+                                      var pedido = {
+                                        'id': _pedido[0].id,
+                                        'idUser': _pedido[0].idUser,
+                                        'nombre': _pedido[0].nombre,
+                                        'correo': _pedido[0].correo,
+                                        'telefono': _pedido[0].telefono,
+                                        'direccion': _pedido[0].direccion,
+                                        'cantidad': _pedido[0].cantidad,
+                                        'total': _pedido[0].total,
+                                        'metodoPago': _pedido[0].metodoPago,
+                                        'fechaDeCompra':
+                                            _pedido[0].fechaDeCompra,
+                                        'horaDeCompra': _pedido[0].horaDeCompra,
+                                        'estado': "Enviado",
+                                        'tiempoDeEntrega':
+                                            _pedido[0].tiempoDeEntrega,
+                                      };
+                                      controlpedido.actualizarPedido(
+                                          _pedido[0].id, pedido);
+                                      controlnotificacion
+                                          .actualizarNotificacion(notificacion)
+                                          .then((value) =>
+                                              Navigator.of(context).pop());
+                                    },
                                     child: Container(
                                         child: Text(
                                       "Marcar retraso⌚",
@@ -670,7 +791,26 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     ),
                                   ),
                                   ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      DateTime now = DateTime.now();
+                                      var notificacion = {
+                                        'iduser': _pedido[0].idUser,
+                                        'titulo': "Su Pedido ha sido cancelado",
+                                        'descripcion':
+                                            "Su pedido ha sido cancelado, Estamos trabajando para solucionarlo.",
+                                        'tiempoEntrega':
+                                            _pedido[0].tiempoDeEntrega,
+                                        'estado': "Cancelado",
+                                        'hora': DateFormat('HH:mm').format(now),
+                                        'fecha': DateFormat('dd-MM-yyyy')
+                                            .format(now),
+                                      };
+                                      _pedido.remove(_pedido[0]);
+                                      controlnotificacion
+                                          .actualizarNotificacion(notificacion)
+                                          .then((value) =>
+                                              Navigator.of(context).pop());
+                                    },
                                     child: Container(
                                         child: Text(
                                       "Eliminar❌",

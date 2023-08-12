@@ -57,4 +57,48 @@ class PeticionesPedido {
       throw error;
     }
   }
+
+  static Future<List<Map<String, dynamic>>> obtenerPedidoEstado(
+      String estado) async {
+    try {
+      List<Map<String, dynamic>> pedidos = [];
+      final tableName = 'pedido';
+      final response =
+          await _client.from(tableName).select('*').eq('estadoEntrega', estado);
+      if (response.isNotEmpty) {
+        pedidos = List<Map<String, dynamic>>.from(response);
+        print("pedidos: $pedidos");
+      } else {
+        pedidos = [];
+      }
+      return pedidos;
+    } catch (error) {
+      print('Error en la operación de obtener pedido: $error');
+      throw error;
+    }
+  }
+
+  static Future<dynamic> actualizarPedido(
+      String id, Map<String, dynamic> pedido) async {
+    try {
+      final tableName = 'pedido';
+      final response =
+          await _client.from(tableName).update(pedido).eq('uid', id);
+      return response;
+    } catch (error) {
+      print('Error en la operación de actualizar pedido: $error');
+      throw error;
+    }
+  }
+
+  static Future<dynamic> eliminarPedido(String id) async {
+    try {
+      final tableName = 'pedido';
+      final response = await _client.from(tableName).delete().eq('uid', id);
+      return response;
+    } catch (error) {
+      print('Error en la operación de eliminar pedido: $error');
+      throw error;
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:acfashion_store/domain/controller/controllerCompra.dart';
 import 'package:acfashion_store/domain/controller/controllerFavorito.dart';
+import 'package:acfashion_store/domain/controller/controllerNotificacion.dart';
 import 'package:acfashion_store/domain/controller/controllerPedido.dart';
 import 'package:acfashion_store/domain/controller/controllerProducto.dart';
 import 'package:acfashion_store/domain/controller/controllerUserAuth.dart';
@@ -7,6 +8,7 @@ import 'package:acfashion_store/domain/controller/controllerUserPerfil.dart';
 import 'package:acfashion_store/ui/home/dashboard_screen.dart';
 import 'package:acfashion_store/ui/home/drawer_screen.dart';
 import 'package:acfashion_store/ui/models/favorite_model.dart';
+import 'package:acfashion_store/ui/models/notification_model.dart';
 import 'package:acfashion_store/ui/models/orders_model.dart';
 import 'package:acfashion_store/ui/models/purchases_model.dart';
 import 'package:acfashion_store/ui/models/theme_model.dart';
@@ -33,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   ControlPedido controlpedidos = Get.put(ControlPedido());
   ControlFavoritos controlfavoritos = Get.put(ControlFavoritos());
   ControlCompra controlcompras = Get.put(ControlCompra());
+  ControlNotificacion controlnotificaciones = Get.put(ControlNotificacion());
   //VARIABLES DE CONTROL
   String idUsuario = '';
   String? uid;
@@ -57,11 +60,13 @@ class _MainScreenState extends State<MainScreen> {
   List<Map<String, dynamic>> consultaFavoritos = [];
   List<Map<String, dynamic>> consultaCompras = [];
   List<Map<String, dynamic>> consultaPedidos = [];
+  List<Map<String, dynamic>> consultaNotificaciones = [];
   List<UsersModel> usuarios = [];
   List<FavoriteModel> favoritos = [];
   List<PurchasesModel> compras = [];
   List<OrdersModel> pedidos = [];
   List<ProductModel> productos = [];
+  List<NotificationModel> notificaciones = [];
   //MAPAS
   Map<String, dynamic> perfil = {};
 
@@ -382,8 +387,8 @@ class _MainScreenState extends State<MainScreen> {
         print("Error al cargar datos de compras");
       }
     });
-    //Se obtienen datos de pedidos
-    controlpedidos.consultarPedido().then((value) => {
+    //Se obtienen datos de pedidos pendientes
+    controlpedidos.consultarPedidoEstado('Pendiente').then((value) => {
           setState(() {
             msg = controlpedidos.mensajesPedido;
           }),
@@ -463,6 +468,158 @@ class _MainScreenState extends State<MainScreen> {
                         horaDeCompra,
                         estado,
                         tiempoDeEntrega,
+                      ),
+                    );
+                  });
+                }
+              })
+            }
+        });
+    //Se obtienen datos de pedidos retrasados
+    controlpedidos.consultarPedidoEstado('Retrasado').then((value) => {
+          setState(() {
+            msg = controlpedidos.mensajesPedido;
+          }),
+          if (msg == "Proceso exitoso")
+            {
+              setState(() {
+                consultaPedidos = controlpedidos.datosPedidos;
+                print(
+                    "Datos de pedidos recibidos en MainScreen: $consultaPedidos");
+                if (consultaPedidos.length > 1) {
+                  for (var i = 0; i < consultaPedidos.length; i++) {
+                    var uid = consultaPedidos[i]['uid'] ?? '';
+                    var iduser = consultaPedidos[i]['iduser'] ?? '';
+                    var nombre = consultaPedidos[i]['nombre'] ?? '';
+                    var correo = consultaPedidos[i]['correo'] ?? '';
+                    var telefono = consultaPedidos[i]['celular'] ?? '';
+                    var direccion = consultaPedidos[i]['direccion'] ?? '';
+                    var foto = consultaPedidos[i]['foto'] ?? '';
+                    var cantidad = consultaPedidos[i]['cantidad'] ?? 0;
+                    var total = consultaPedidos[i]['total'] ?? '0.0';
+                    var metodoPago = consultaPedidos[i]['metodoPago'] ?? '';
+                    var fechaDeCompra = consultaPedidos[i]['fechaCompra'] ?? '';
+                    var horaDeCompra = consultaPedidos[i]['horaCompra'] ?? '';
+                    var estado = consultaPedidos[i]['estadoEntrega'] ?? '';
+                    var tiempoDeEntrega =
+                        consultaPedidos[i]['tiempoDeEntrega'] ?? '';
+                    print("Celular recibido: $telefono");
+                    print("Estado de entrega recibido: $estado");
+                    pedidos.add(
+                      OrdersModel(
+                        uid,
+                        iduser,
+                        nombre,
+                        correo,
+                        telefono,
+                        foto,
+                        direccion,
+                        cantidad,
+                        total,
+                        metodoPago,
+                        fechaDeCompra,
+                        horaDeCompra,
+                        estado,
+                        tiempoDeEntrega,
+                      ),
+                    );
+                  }
+                } else {
+                  consultaPedidos.forEach((element) {
+                    var uid = element['uid'] ?? '';
+                    var iduser = element['iduser'] ?? '';
+                    var nombre = element['nombre'] ?? '';
+                    var correo = element['correo'] ?? '';
+                    var telefono = element['celular'] ?? '';
+                    var direccion = element['direccion'] ?? '';
+                    var foto = element['foto'] ?? '';
+                    var cantidad = element['cantidad'] ?? 0;
+                    var total = element['total'] ?? 0;
+                    var metodoPago = element['metodoPago'] ?? '';
+                    var fechaDeCompra = element['fechaCompra'] ?? '';
+                    var horaDeCompra = element['horaCompra'] ?? '';
+                    var estado = element['estadoEntrega'] ?? '';
+                    var tiempoDeEntrega = element['tiempoEntrega'] ?? '';
+                    pedidos.add(
+                      OrdersModel(
+                        uid,
+                        iduser,
+                        nombre,
+                        correo,
+                        telefono,
+                        foto,
+                        direccion,
+                        cantidad,
+                        total,
+                        metodoPago,
+                        fechaDeCompra,
+                        horaDeCompra,
+                        estado,
+                        tiempoDeEntrega,
+                      ),
+                    );
+                  });
+                }
+              })
+            }
+        });
+    //Se obtienen datos de notificaciones
+    controlnotificaciones.filtrarNotificacion(idUsuario).then((value) => {
+          setState(() {
+            msg = controlnotificaciones.mensajesNotificacion;
+          }),
+          if (msg == "Proceso exitoso")
+            {
+              setState(() {
+                consultaNotificaciones =
+                    controlnotificaciones.datosNotificaciones;
+                print(
+                    "Datos de notificaciones recibidos en MainScreen: $consultaNotificaciones");
+                if (consultaNotificaciones.length > 1) {
+                  for (var i = 0; i < consultaNotificaciones.length; i++) {
+                    var uid = consultaNotificaciones[i]['uid'] ?? '';
+                    var idUser = consultaNotificaciones[i]['iduser'] ?? '';
+                    var titulo = consultaNotificaciones[i]['titulo'] ?? '';
+                    var descripcion =
+                        consultaNotificaciones[i]['descripcion'] ?? '';
+                    var tiempoEntrega =
+                        consultaNotificaciones[i]['tiempoEntrega'] ?? '';
+                    var fecha = consultaNotificaciones[i]['fecha'] ?? '';
+                    var hora = consultaNotificaciones[i]['hora'] ?? '';
+                    var estado = consultaNotificaciones[i]['estado'] ?? '';
+                    notificaciones.add(
+                      NotificationModel(
+                        uid: uid,
+                        idUser: idUser,
+                        titulo: titulo,
+                        descripcion: descripcion,
+                        tiempoEntrega: tiempoEntrega,
+                        fecha: fecha,
+                        hora: hora,
+                        estado: estado,
+                      ),
+                    );
+                  }
+                } else {
+                  consultaNotificaciones.forEach((element) {
+                    var uid = element['uid'] ?? '';
+                    var idUser = element['iduser'] ?? '';
+                    var titulo = element['titulo'] ?? '';
+                    var descripcion = element['descripcion'] ?? '';
+                    var tiempoEntrega = element['tiempoEntrega'] ?? '';
+                    var fecha = element['fecha'] ?? '';
+                    var hora = element['hora'] ?? '';
+                    var estado = element['estado'] ?? '';
+                    notificaciones.add(
+                      NotificationModel(
+                        uid: uid,
+                        idUser: idUser,
+                        titulo: titulo,
+                        descripcion: descripcion,
+                        tiempoEntrega: tiempoEntrega,
+                        fecha: fecha,
+                        hora: hora,
+                        estado: estado,
                       ),
                     );
                   });
@@ -618,6 +775,7 @@ class _MainScreenState extends State<MainScreen> {
                           favoritos: favoritos,
                           compras: compras,
                           pedidos: pedidos,
+                          notificaciones: notificaciones,
                         ),
                       ],
                     ),

@@ -56,11 +56,11 @@ class PeticionesCompra {
     }
   }
 
-  static Future<dynamic> eliminarCompra(idcompra) async {
+  static Future<dynamic> eliminarCompra(idpedido) async {
     try {
       final tableNameCompra = 'compra';
       final responseCompra =
-          await _client.from(tableNameCompra).delete().eq('idcompra', idcompra);
+          await _client.from(tableNameCompra).delete().eq('idpedido', idpedido);
       return responseCompra;
     } catch (error) {
       print('Error en la operación de eliminar compra: $error');

@@ -32,6 +32,7 @@ class DashboardScreen extends StatefulWidget {
   final List<PurchasesModel> compras;
   final List<OrdersModel> pedidos;
   final List<UsersModel> usuarios;
+  final List<NotificationModel> notificaciones;
   DashboardScreen({
     Key? key,
     required this.id,
@@ -47,6 +48,7 @@ class DashboardScreen extends StatefulWidget {
     required this.compras,
     required this.pedidos,
     required this.usuarios,
+    required this.notificaciones,
   }) : super(key: key);
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
@@ -94,16 +96,18 @@ class _DashboardScreenState extends State<DashboardScreen>
   List<OrdersModel> pedidos = [];
   List<ProductModel> colors = [];
   List<UsersModel> usuarios = [];
-  List<NotificationModel> notifications = [];
+  List<NotificationModel> _notificaciones = [];
   List<ProductModel> productosGestionados = [];
   bool _isDarkMode = false;
+  int currentPage = 0;
+  int cantidadProductosSeleccionados = 0;
 
   List<ProductModel> generateProducts() {
     return productos;
   }
 
   List<NotificationModel> notificationsList() {
-    return notifications;
+    return _notificaciones;
   }
 
   //Pendiente para cambiar esta funcion
@@ -112,8 +116,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     "assets/images/banners/img_banner2.png",
     "assets/images/banners/img_banner3.png",
   ];
-  int currentPage = 0;
-  int cantidadProductosSeleccionados = 0;
 
   void obtenerCantidadProductosSeleccionados(
       int cantidadProductosSeleccionados) {
@@ -126,14 +128,6 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   void obtenerCarrito(List<Map<String, dynamic>> carrito) {
     this.carrito = carrito;
-  }
-
-  void _mostrarAlerta() {
-    Get.snackbar(
-      "Error de conexion",
-      "No se pudo conectar con el servidor",
-      duration: const Duration(seconds: 4),
-    );
   }
 
   void cargarDatos() {
@@ -151,6 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     compras = widget.compras;
     pedidos = widget.pedidos;
     usuarios = widget.usuarios;
+    _notificaciones = widget.notificaciones;
     perfil = <String, dynamic>{
       'uid': id,
       'correo': correoPerfil,
@@ -176,6 +171,104 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  List<Widget> buildNotifications() {
+    final theme = Provider.of<ThemeChanger>(context);
+    var temaActual = theme.getTheme();
+    if (temaActual == ThemeData.dark()) {
+      _isDarkMode = true;
+    } else {
+      _isDarkMode = false;
+    }
+    return _notificaciones.length > 0
+        ? _notificaciones.map((e) {
+            return Container(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      e.titulo,
+                      style: TextStyle(
+                        color:
+                            _isDarkMode != false ? Colors.white : Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      e.hora,
+                      style: TextStyle(
+                        color:
+                            _isDarkMode != false ? Colors.white : Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      e.fecha,
+                      style: TextStyle(
+                        color:
+                            _isDarkMode != false ? Colors.white : Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      e.descripcion,
+                      style: TextStyle(
+                        color:
+                            _isDarkMode != false ? Colors.white : Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      e.tiempoEntrega,
+                      style: TextStyle(
+                        color:
+                            _isDarkMode != false ? Colors.white : Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ));
+          }).toList()
+        : [
+            Container(
+              height: 300.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "No tienes notificaciones",
+                    style: TextStyle(
+                      color: _isDarkMode != false
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ];
+  }
+
   void _mostrarNotificaciones() {
     showDialog(
       context: context,
@@ -183,58 +276,90 @@ class _DashboardScreenState extends State<DashboardScreen>
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              backgroundColor: _isDarkMode != false
-                  ? Color.fromARGB(255, 19, 18, 18)
-                  : Colors.white,
-              title: Text(
-                'Mis Notificaciones',
-                style: TextStyle(
-                    color: _isDarkMode != false ? Colors.white : Colors.black),
-              ),
-              content: Container(
-                color: _isDarkMode != false
-                    ? Color.fromARGB(255, 19, 18, 18)
-                    : Colors.white,
-                padding: EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: _isDarkMode != false
+            return _notificaciones.length > 0
+                ? AlertDialog(
+                    backgroundColor: _isDarkMode != false
                         ? Color.fromARGB(255, 19, 18, 18)
                         : Colors.white,
-                    padding: EdgeInsets.all(5.0),
-                    child: Center(
-                      child: Column(
-                        children: [],
-                      ),
+                    title: Text(
+                      'Mis Notificaciones',
+                      style: TextStyle(
+                          color: _isDarkMode != false
+                              ? Colors.white
+                              : Colors.black),
                     ),
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // Lógica para guardar los cambios realizados en el perfil
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Marcar como leidas',
+                    content: Container(
+                        color: _isDarkMode != false
+                            ? Color.fromARGB(255, 19, 18, 18)
+                            : Colors.white,
+                        padding: EdgeInsets.all(10.0),
+                        child: SizedBox(
+                          height: 300.0,
+                          width: 300.0,
+                          child: ListView(
+                            children: buildNotifications(),
+                          ),
+                        )),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          // Lógica para guardar los cambios realizados en el perfil
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Marcar como leidas',
+                            style: TextStyle(
+                                color: _isDarkMode != false
+                                    ? Colors.white
+                                    : Colors.black)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Borrar',
+                            style: TextStyle(
+                                color: _isDarkMode != false
+                                    ? Colors.white
+                                    : Colors.black)),
+                      ),
+                    ],
+                  )
+                : AlertDialog(
+                    backgroundColor: _isDarkMode != false
+                        ? Color.fromARGB(255, 19, 18, 18)
+                        : Colors.white,
+                    title: Text(
+                      'Mis Notificaciones',
                       style: TextStyle(
                           color: _isDarkMode != false
                               ? Colors.white
-                              : Colors.black)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Borrar',
-                      style: TextStyle(
-                          color: _isDarkMode != false
-                              ? Colors.white
-                              : Colors.black)),
-                ),
-              ],
-            );
+                              : Colors.black),
+                    ),
+                    content: Container(
+                        color: _isDarkMode != false
+                            ? Color.fromARGB(255, 19, 18, 18)
+                            : Colors.white,
+                        padding: EdgeInsets.all(10.0),
+                        child: SizedBox(
+                          height: 300.0,
+                          width: 300.0,
+                          child: ListView(
+                            children: buildNotifications(),
+                          ),
+                        )),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Cerrar',
+                            style: TextStyle(
+                                color: _isDarkMode != false
+                                    ? Colors.white
+                                    : Colors.black)),
+                      ),
+                    ],
+                  );
           },
         );
       },
@@ -347,7 +472,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     double displayWidth = MediaQuery.of(context).size.width;
-    Size size = MediaQuery.of(context).size;
     final theme = Provider.of<ThemeChanger>(context);
     var temaActual = theme.getTheme();
     if (temaActual == ThemeData.dark()) {
