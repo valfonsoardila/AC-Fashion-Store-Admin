@@ -1,6 +1,7 @@
 import 'package:acfashion_store/ui/models/theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class SeeStatisticsScreen extends StatefulWidget {
   SeeStatisticsScreen({super.key});

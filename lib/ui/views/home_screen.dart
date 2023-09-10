@@ -13,8 +13,8 @@ import 'package:acfashion_store/ui/views/summary_views/see_orders_screen.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_products_screens.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_statistics_screen.dart';
 import 'package:acfashion_store/ui/views/summary_views/see_users_screen.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,19 +36,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late List<dynamic> data;
+  late TooltipBehavior _tooltip;
+  double min = 0;
+  double max = 10000000;
+  double valorVenta = 0;
+  List<String> Meses = [
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic'
+  ];
+
   ControlCompra controlc = ControlCompra();
   List<OrdersModel> pedidos = [];
   List<PurchasesModel> compras = [];
   List<ProductModel> productos = [];
   List<UsersModel> usuarios = [];
   List<ProductModel> productosGestonados = [];
+  bool _isDarkMode = false;
+  bool availableFoto = false;
+  //Lista de colores para los cards
   List<Color> gradientColors = [
     Color(0xff23b6e6),
     Color(0xff02d39a),
   ];
-  bool _isDarkMode = false;
-  bool availableFoto = false;
-
   List<Color> listaColoresLight = [
     const Color.fromARGB(255, 217, 48, 93),
     const Color.fromARGB(255, 140, 20, 120),
@@ -63,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Color.fromARGB(255, 83, 4, 94),
     Color.fromARGB(255, 107, 5, 71),
     const Color.fromARGB(255, 89, 2, 34),
-    const Color.fromARGB(255, 38, 1, 21),
+    Color.fromARGB(255, 56, 1, 31),
     Color.fromARGB(255, 134, 7, 71),
     const Color.fromARGB(255, 89, 2, 59),
     Color.fromARGB(255, 92, 5, 62),
@@ -73,12 +93,87 @@ class _HomeScreenState extends State<HomeScreen> {
     widget.productosGestionados(productos);
   }
 
+  //Callback para obtener el producto seleccionado
   void obtenerProductoSeleccionado(List<ProductModel> producto) {
     this.productosGestonados = producto;
     setState(() {
       productos = productosGestonados;
     });
     retornoProducto(productosGestonados);
+  }
+
+  double obtenerSumatoriaVentas(List<OrdersModel> pedidos) {
+    double sumatoria = 0;
+    String mes = '';
+    for (var i = 0; i < pedidos.length; i++) {
+      mes = pedidos[i].fechaDeCompra.substring(3, 5);
+      if (mes == '01') {
+        data[0] = _ChartData('Ene', data[0].y + pedidos[i].total);
+        sumatoria = sumatoria + pedidos[i].total;
+      } else {
+        if (mes == '02') {
+          data[1] = _ChartData('Feb', data[1].y + pedidos[i].total);
+          sumatoria = sumatoria + pedidos[i].total;
+        } else {
+          if (mes == '03') {
+            data[2] = _ChartData('Mar', data[2].y + pedidos[i].total);
+            sumatoria = sumatoria + pedidos[i].total;
+          } else {
+            if (mes == '04') {
+              data[3] = _ChartData('Abr', data[3].y + pedidos[i].total);
+              sumatoria = sumatoria + pedidos[i].total;
+            } else {
+              if (mes == '05') {
+                data[4] = _ChartData('May', data[4].y + pedidos[i].total);
+                sumatoria = sumatoria + pedidos[i].total;
+              } else {
+                if (mes == '06') {
+                  data[5] = _ChartData('Jun', data[5].y + pedidos[i].total);
+                  sumatoria = sumatoria + pedidos[i].total;
+                } else {
+                  if (mes == "07") {
+                    data[6] = _ChartData('Jul', data[6].y + pedidos[i].total);
+                    sumatoria = sumatoria + pedidos[i].total;
+                  } else {
+                    if (mes == '08') {
+                      data[7] = _ChartData('Ago', data[7].y + pedidos[i].total);
+                      sumatoria = sumatoria + pedidos[i].total;
+                    } else {
+                      if (mes == '09') {
+                        data[8] =
+                            _ChartData('Sep', data[8].y + pedidos[i].total);
+                        sumatoria = sumatoria + pedidos[i].total;
+                      } else {
+                        if (mes == '10') {
+                          data[9] =
+                              _ChartData('Oct', data[9].y + pedidos[i].total);
+                          sumatoria = sumatoria + pedidos[i].total;
+                        } else {
+                          if (mes == '11') {
+                            data[10] = _ChartData(
+                                'Nov', data[10].y + pedidos[i].total);
+                            sumatoria = sumatoria + pedidos[i].total;
+                          } else {
+                            if (mes == '12') {
+                              data[11] = _ChartData(
+                                  'Dic', data[11].y + pedidos[i].total);
+                              sumatoria = sumatoria + pedidos[i].total;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    print(mes);
+    print(sumatoria.toString());
+    return sumatoria;
   }
 
   @override
@@ -88,6 +183,22 @@ class _HomeScreenState extends State<HomeScreen> {
     compras = widget.compras;
     productos = widget.productos;
     usuarios = widget.usuarios;
+    data = [
+      _ChartData('Ene', valorVenta),
+      _ChartData('Feb', 0),
+      _ChartData('Mar', 0),
+      _ChartData('Abr', 0),
+      _ChartData('May', 0),
+      _ChartData('Jun', 0),
+      _ChartData('Jul', 0),
+      _ChartData('Ago', 0),
+      _ChartData('Sep', 0),
+      _ChartData('Oct', 0),
+      _ChartData('Nov', 0),
+      _ChartData('Dic', 0),
+    ];
+    _tooltip = TooltipBehavior(enable: true);
+    valorVenta = obtenerSumatoriaVentas(pedidos);
   }
 
   @override
@@ -205,449 +316,47 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.all(10),
                               alignment: Alignment.topLeft,
                               child: Container(
-                                height: MediaQuery.of(context).size.height,
-                                width: MediaQuery.of(context).size.width,
-                                child: Stack(children: [
-                                  //Grafico interactivo donde se mostrara los ingresos mes a mes
-                                  LineChart(
-                                    LineChartData(
-                                      // read about it in the LineChartData section
-                                      backgroundColor: Colors.transparent,
-                                      showingTooltipIndicators: [],
-                                      clipData: FlClipData.all(),
-                                      borderData: FlBorderData(
-                                          show: true,
-                                          border: Border(
-                                              bottom: BorderSide(
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                              left: BorderSide(
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                              right: BorderSide(
-                                                  color: Colors.transparent),
-                                              top: BorderSide(
-                                                  color: Colors.transparent))),
-                                      baselineX: 0,
-                                      baselineY: 0,
-                                      maxX: 12,
-                                      maxY: 12,
-                                      minX: 0,
-                                      minY: 0,
-                                      lineBarsData: [
-                                        LineChartBarData(
-                                          show: true,
-                                          shadow: Shadow(
-                                              blurRadius: 2,
-                                              color: MyColors.myPurple),
-                                          spots: [
-                                            FlSpot(0, 0),
-                                            FlSpot(5, 5),
-                                            FlSpot(7, 6),
-                                            FlSpot(8, 4),
-                                          ],
-                                          isCurved: true,
-                                          curveSmoothness: 0.5,
-                                          barWidth: 3,
-                                          showingIndicators: [0, 1, 2, 3],
-                                          dashArray: [2, 2],
-                                          aboveBarData: BarAreaData(
-                                            show: true,
-                                            cutOffY: 0,
-                                            applyCutOffY: true,
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: gradientColors
-                                                  .map((color) =>
-                                                      color.withOpacity(0.3))
-                                                  .toList(),
-                                              transform: GradientRotation(90),
-                                            ),
-                                            spotsLine: BarAreaSpotsLine(
-                                              show: true,
-                                              flLineStyle: FlLine(
-                                                color: _isDarkMode
-                                                    ? MyColors.myBlue
-                                                    : MyColors.myPurple,
-                                                strokeWidth: 1,
-                                              ),
-                                              checkToShowSpotLine: (spot) {
-                                                if (spot.x == 0 ||
-                                                    spot.x == 5 ||
-                                                    spot.x == 7 ||
-                                                    spot.x == 8) {
-                                                  return true;
-                                                } else {
-                                                  return false;
-                                                }
-                                              },
-                                            ),
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: SfCartesianChart(
+                                      plotAreaBorderWidth: 0,
+                                      title: ChartTitle(
+                                          text: 'Flujo de ventas: $valorVenta'),
+                                      legend: Legend(isVisible: false),
+                                      primaryXAxis: CategoryAxis(
+                                        labelPlacement: LabelPlacement.onTicks,
+                                        majorGridLines:
+                                            MajorGridLines(width: 0),
+                                        name: 'Meses',
+                                        title: AxisTitle(text: 'Meses'),
+                                        axisLine: AxisLine(width: 0),
+                                        arrangeByIndex: true,
+                                        labelIntersectAction:
+                                            AxisLabelIntersectAction.rotate45,
+                                      ),
+                                      primaryYAxis: NumericAxis(
+                                          name: 'Ingresos',
+                                          title: AxisTitle(text: 'Ingresos'),
+                                          minimum: min,
+                                          maximum: max,
+                                          interval: max / 10),
+                                      series: <ChartSeries<dynamic, String>>[
+                                        AreaSeries<dynamic, String>(
+                                          dataSource: data,
+                                          xValueMapper: (dynamic data, _) =>
+                                              data.x,
+                                          yValueMapper: (dynamic data, _) =>
+                                              data.y,
+                                          name: 'Gold',
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: gradientColors,
                                           ),
-                                          belowBarData: BarAreaData(
-                                            show: true,
-                                            cutOffY: 0,
-                                            applyCutOffY: true,
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: gradientColors
-                                                  .map((color) =>
-                                                      color.withOpacity(0.3))
-                                                  .toList(),
-                                              transform: GradientRotation(90),
-                                            ),
-                                            spotsLine: BarAreaSpotsLine(
-                                              show: true,
-                                              flLineStyle: FlLine(
-                                                color: _isDarkMode
-                                                    ? MyColors.myBlue
-                                                    : MyColors.myPurple,
-                                                strokeWidth: 1,
-                                              ),
-                                              checkToShowSpotLine: (spot) {
-                                                if (spot.x == 0 ||
-                                                    spot.x == 5 ||
-                                                    spot.x == 7 ||
-                                                    spot.x == 8) {
-                                                  return true;
-                                                } else {
-                                                  return false;
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          dotData: FlDotData(
-                                            show: true,
-                                            getDotPainter: (spot, percent,
-                                                barData, index) {
-                                              return FlDotCirclePainter(
-                                                radius: 5,
-                                                color: _isDarkMode
-                                                    ? MyColors.myBlue
-                                                    : MyColors.myPurple,
-                                                strokeWidth: 1,
-                                                strokeColor: _isDarkMode
-                                                    ? MyColors.myBlue
-                                                    : MyColors.myPurple,
-                                              );
-                                            },
-                                          ),
-                                          lineChartStepData: LineChartStepData(
-                                            stepDirection: 12,
-                                          ),
-                                          preventCurveOverShooting: true,
-                                          preventCurveOvershootingThreshold: 1,
+                                          color: Color.fromRGBO(
+                                              255, 255, 255, 0.3),
                                         )
-                                      ],
-                                      lineTouchData: LineTouchData(
-                                        enabled: true,
-                                        touchTooltipData: LineTouchTooltipData(
-                                          tooltipBgColor: _isDarkMode
-                                              ? MyColors.myBlue
-                                              : MyColors.myPurple,
-                                          getTooltipItems: (touchedSpots) {
-                                            return touchedSpots.map((e) {
-                                              return LineTooltipItem(
-                                                e.y.toString(),
-                                                TextStyle(
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              );
-                                            }).toList();
-                                          },
-                                        ),
-                                        longPressDuration: Duration(
-                                            milliseconds:
-                                                500), //tiempo que se mantiene presionado para mostrar el tooltip
-                                        getTouchedSpotIndicator:
-                                            (LineChartBarData barData,
-                                                List<int> spotIndexes) {
-                                          return spotIndexes.map((spotIndex) {
-                                            final FlSpot spot =
-                                                barData.spots[spotIndex];
-                                            if (spot.x == 0 ||
-                                                spot.x == 5 ||
-                                                spot.x == 7 ||
-                                                spot.x == 8) {
-                                              return TouchedSpotIndicatorData(
-                                                FlLine(
-                                                  color: _isDarkMode
-                                                      ? MyColors.myBlue
-                                                      : MyColors.myPurple,
-                                                  strokeWidth: 2,
-                                                ),
-                                                FlDotData(
-                                                  show: true,
-                                                  getDotPainter: (spot, percent,
-                                                      barData, index) {
-                                                    return FlDotCirclePainter(
-                                                      radius: 5,
-                                                      color: _isDarkMode
-                                                          ? MyColors.myBlue
-                                                          : MyColors.myPurple,
-                                                      strokeWidth: 1,
-                                                      strokeColor: _isDarkMode
-                                                          ? MyColors.myBlue
-                                                          : MyColors.myPurple,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            } else {
-                                              return TouchedSpotIndicatorData(
-                                                FlLine(
-                                                  color: Colors.transparent,
-                                                ),
-                                                FlDotData(
-                                                  show: false,
-                                                ),
-                                              );
-                                            }
-                                          }).toList();
-                                        },
-                                      ),
-                                      gridData: FlGridData(
-                                        show: false,
-                                      ),
-                                      titlesData: FlTitlesData(
-                                        show: true,
-                                        topTitles: AxisTitles(
-                                          axisNameSize: 22,
-                                          axisNameWidget: Container(
-                                            child: Text(
-                                              "Ingresos mensuales",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                            ),
-                                          ),
-                                          sideTitles: SideTitles(
-                                            showTitles: false,
-                                            interval: 1,
-                                          ),
-                                        ),
-                                        bottomTitles: AxisTitles(
-                                          axisNameSize: 18,
-                                          axisNameWidget: Container(
-                                            child: Text(
-                                              "Meses del año",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                            ),
-                                          ),
-                                          drawBelowEverything: true,
-                                          sideTitles: SideTitles(
-                                            reservedSize: 30,
-                                            interval: 1,
-                                            showTitles: true,
-                                            getTitlesWidget: (value, index) {
-                                              // Aquí agregamos un segundo argumento 'meta'
-                                              switch (value.toInt()) {
-                                                case 0:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Ene",
-                                                    ),
-                                                  );
-                                                case 1:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Feb",
-                                                    ),
-                                                  );
-                                                case 2:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Mar",
-                                                    ),
-                                                  );
-                                                case 3:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Abr",
-                                                    ),
-                                                  );
-                                                case 4:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "May",
-                                                    ),
-                                                  );
-                                                case 5:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Jun",
-                                                    ),
-                                                  );
-                                                case 6:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Jul",
-                                                    ),
-                                                  );
-                                                case 7:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Ago",
-                                                    ),
-                                                  );
-                                                case 8:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Sep",
-                                                    ),
-                                                  );
-                                                case 9:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Oct",
-                                                    ),
-                                                  );
-                                                case 10:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Nov",
-                                                    ),
-                                                  );
-                                                case 11:
-                                                  return Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 7,
-                                                            vertical: 5),
-                                                    child: Text(
-                                                      "Dic",
-                                                    ),
-                                                  );
-                                                default:
-                                                  return Text(
-                                                      ""); // Devolvemos un widget vacío en caso de que no haya una coincidencia
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                        leftTitles: AxisTitles(
-                                          axisNameSize: 18,
-                                          axisNameWidget: Container(
-                                            child: Text(
-                                              "Ingresos",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                            ),
-                                          ),
-                                          drawBelowEverything: true,
-                                          sideTitles: SideTitles(
-                                              showTitles: true,
-                                              reservedSize: 32,
-                                              interval: 1,
-                                              getTitlesWidget: (value, meta) {
-                                                switch (value.toInt()) {
-                                                  case 0:
-                                                    return Text("0.5m");
-                                                  case 1:
-                                                    return Text("1m");
-                                                  case 2:
-                                                    return Text("1.5m");
-                                                  case 3:
-                                                    return Text("2m");
-                                                  case 4:
-                                                    return Text("2.5m");
-                                                  case 5:
-                                                    return Text("3m");
-                                                  case 6:
-                                                    return Text("3.5m");
-                                                  case 7:
-                                                    return Text("4m");
-                                                  case 8:
-                                                    return Text("4.5m");
-                                                  case 9:
-                                                    return Text("5m");
-                                                  case 10:
-                                                    return Text("5.5m");
-                                                  case 11:
-                                                    return Text("6m");
-                                                  default:
-                                                    return Text("");
-                                                }
-                                              } // Aquí agregamos un segundo argumento 'meta'
-                                              ),
-                                        ),
-                                        rightTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: false,
-                                            interval: 1,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    duration:
-                                        Duration(milliseconds: 150), // Optional
-                                    curve: Curves.linear, // Optional
-                                  ),
-                                ]),
-                              ),
+                                      ])),
                             ),
                           ),
                         ],
@@ -674,6 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 MaterialPageRoute(
                                     builder: (context) => SeeOrdersScreen(
                                           pedidos: pedidos,
+                                          productos: productos,
                                         )),
                               );
                             },
@@ -1272,4 +982,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ));
   }
+}
+
+class _ChartData {
+  _ChartData(this.x, this.y);
+
+  final String x;
+  final double y;
 }

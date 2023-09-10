@@ -207,6 +207,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     if (widget.pedido != null &&
         widget.productosPedido != null &&
         widget.productos != null) {
+      print("Entro al if");
       _pedido.add(widget.pedido);
       _productosExistentes = widget.productos;
       widget.productosPedido.forEach((element) {

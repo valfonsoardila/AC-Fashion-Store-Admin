@@ -88,8 +88,8 @@ class _LoginState extends State<Login> {
                   borderRadius: BorderRadius.circular(
                       25), // Ajusta el valor según el radio que desees
                   color: _isDarkMode != false
-                      ? Colors.black
-                      : Colors.grey.shade100.withOpacity(0.8),
+                      ? Colors.black.withOpacity(0.6)
+                      : Colors.grey.shade100.withOpacity(0.7),
                 ),
                 child: Stack(
                   children: [

@@ -830,7 +830,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   List<String> listOfStrings = [
     'Inicio',
     'Productos',
-    'Estadistica',
+    'Chats',
     'Ajustes',
   ];
 }
